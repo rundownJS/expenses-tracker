@@ -1,0 +1,316 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body{
+    min-width: 100vw;
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    background-color: #fff;
+    flex-direction: column;
+    font-family: 'Poppins';
+    overflow-y: auto;
+}
+
+.page-content{
+    display: flex;
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+}
+.element-wrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    width: 400px;
+    padding: 20px 40px;
+    gap: 30px;
+    margin: 30px 0;
+}
+form{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 30px
+}
+
+.title-text{
+    font-size: 1.7rem;
+    font-weight: 500;
+    color: #050505;
+    width: 100%;
+    text-align: center;
+    line-height: 1.2;
+    margin: 10px 0;
+}
+::-webkit-scrollbar{
+    width: 8px;
+}
+::-webkit-scrollbar-thumb{
+    background: #b7b7b7;
+    border-radius: 99px;
+}
+
+.field-wrapper{
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 100%;
+}
+.field-placeholder{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 10px;
+    font-size: 0.95rem;
+    color: #050505;
+    pointer-events: none;
+    transition: 150ms linear;
+    background-color: #fff;
+    padding: 0 5px;
+}
+.field-placeholder.small{
+    font-size: 0.8rem;
+}
+.field-placeholder.invalid{
+    color: red;
+}
+
+.field-wrapper > input{
+    padding: 10px 15px;
+    border-radius: 5px;
+    outline: 0;
+    border: 1px solid #D8D8D8;
+    font-size: 0.95rem;
+    color: #050505;
+    width: 100%;
+    font-family: 'Poppins';
+    transition: 150ms linear;
+}
+.field-wrapper > input.invalid{
+    border: 1px solid red;
+}
+
+.field-wrapper > input:not(.invalid):focus, .field-wrapper > input:not(.invalid).focused{
+    border: 1px solid rgb(16, 133, 218);
+}
+
+.field-wrapper > input.password{
+    padding-right: 30px;
+}
+.field-wrapper > .eye-svg{
+    position: absolute;
+    height: 15px;
+    width: 15px;
+    fill: #000;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    user-select: none;
+}
+.eye-svg > svg{
+    width: 100%;
+    height: 100%;
+}
+
+.login-text{
+    cursor: pointer;
+    align-self: flex-start;
+    font-size: 1rem;
+    margin-top: -20px;
+}
+.login-text > a{
+    text-decoration: none;
+    color: rgb(58, 144, 205);
+}
+
+
+.submit-button{
+    border-radius: 8px;
+    background-color: rgb(84, 175, 241);
+    padding: 10px;
+    cursor: pointer;
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 150ms linear;
+    user-select: none;
+}
+.submit-button.disableButton{
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.submit-button:not(.disableButton):hover{
+    background-color: rgb(47, 158, 237);
+}
+.submit-button:not(.disableButton):active{
+    scale: 0.98;
+}
+
+.error-span{
+    position: absolute;
+    color: red;
+    font-size: 0.75rem;
+    top: 100%;
+    left: 0;
+}
+
+.recaptcha-container.failed{
+    animation: captcha_failed 150ms linear forwards;
+}
+@keyframes captcha_failed{
+    0%{
+        transform: translateX(0px);
+    }
+    25%{
+        transform: translateX(10px);
+    }
+    50%{
+        transform: translateX(-10px);
+    }
+    75%{
+        transform: translateX(10px);
+    }
+    100%{
+        transform: translateX(0px);
+    }
+}
+
+
+.password-strength-wrapper{
+    display: flex;
+    flex-direction: column;
+    font-size: 0.75rem;
+    width: 100%;
+    color: #050505;
+    height: 0;
+    overflow: hidden;
+    transition: 100ms linear;
+    margin-top: -30px;
+}
+.bottom-element{
+    display: flex;
+    flex-direction: column;
+    margin-top: 5px;
+}
+.bottom-element > .requirements{
+    display: flex;
+    flex-direction: column;
+    padding-left: 5px;
+}
+.bottom-element > .requirements > span.invalid{
+    color: red;
+}
+.bottom-element > .requirements > span.match{
+    color: rgb(25, 201, 25);
+}
+
+.top-element{
+    display: flex;
+    align-items: center;
+}
+.strength-bar{
+    margin: 0 5px;
+    width: 80px;
+    height: 10px;
+    border: 1px solid #D8D8D8;
+    border-radius: 8px;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+}
+.bar-child{
+    width: 25%;
+    height: 100%;
+    border-right: 1px solid #D8D8D8;
+}
+.bar-child:last-of-type{
+    border-right: 0;
+}
+
+.password-strength-span.weak{
+    color: red;
+}
+.password-strength-span.medium{
+    color: #f0cc00
+}
+.password-strength-span.strong{
+    color: rgb(25, 201, 25);
+}
+.password-strength-span.very_strong{
+    color: rgb(82, 225, 82);
+}
+
+.strength-bar > .background{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    transition: 50ms linear;
+    transform-origin: 0 0;
+    transform: scaleX(0);
+}
+
+.strength-bar > .background.weak{
+    background: red;
+    transform: scaleX(.25);
+}
+.strength-bar > .background.medium{
+    background: linear-gradient(
+        to right,
+        red 50%,
+        rgb(255, 255, 19) 50%
+    );
+    transform: scaleX(.5);
+}
+.strength-bar > .background.strong{
+    background: linear-gradient(
+        to right, 
+        red 0%,
+        red 33.33%,
+        rgb(255, 255, 19) 33.33%,
+        rgb(255, 255, 19) 66.66%,
+        rgb(5, 222, 5) 66.66%,
+        rgb(5, 222, 5) 100%
+    );
+    transform: scaleX(.75);
+}
+.strength-bar > .background.very_strong{
+    background: linear-gradient(
+        to right,
+        red 0%,
+        red 25%,
+        rgb(255, 255, 19) 25%,
+        rgb(255, 255, 19) 50%,
+        rgb(5, 222, 5) 50%,
+        rgb(5, 222, 5) 75%,
+        rgb(69, 255, 69) 75%,
+        rgb(69, 255, 69) 100%
+    );
+    transform: scaleX(1);
+}
+
+
+@media(max-width: 450px){
+    .page-content{
+        align-items: baseline;
+    }
+    .element-wrapper{
+        width: 90%;
+        padding: 20px 30px;
+    }
+}
