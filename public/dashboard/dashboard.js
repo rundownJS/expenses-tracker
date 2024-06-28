@@ -461,6 +461,8 @@ const CORE_FUNCTION = (data, token) =>{
 
                             ADDITIONAL_ELEMENT.innerHTML =``
                         })
+
+                        donutsChartSet()
                     }
                 })
 
@@ -913,11 +915,41 @@ const CORE_FUNCTION = (data, token) =>{
                 })
             }  
             //USER CLICKS THE ELEMENT WITH DATA
-            const createExpenseChart = () =>{
-
+            const createExpenseChart = (chartData) =>{
+                console.log(chartData)
             }          
             const createIncomeChart = () =>{
                 
+            }
+
+
+            //CUSTOM COLORS
+            const CUSTOM_COLORS = {
+                housing: "#D32F2F",
+                transportation: "#1E90FF",
+                food: "#90EE90",
+                utilities: "#FFFF00",
+                health_wellness: "#FFA500",
+                debt: "#800080",
+                entertainment: "#00FFFF",
+                clothing: "#FF00FF",
+                personal_care: "#006400",
+                education: "#FF7F50",
+                gifts_donations: "#000080",
+                miscellaneous: "#40E0D0",
+                other: "#FFD700",
+
+                salary: "#008080",
+                business_income: "#DC143C",
+                investments: "#4B0082",
+                government_payments: "#808000",
+                retirement_income: "#87CEEB",
+                gifts_inheritance: "#FA8072",
+                scholarship_grants: "#6A5ACD",
+                other_income: "#FF8C00"
+            }
+            const getColorForLabel = (labels) =>{
+                return labels.map(label => CUSTOM_COLORS[label])
             }
 
             //if there is in fact data restructure
@@ -930,26 +962,74 @@ const CORE_FUNCTION = (data, token) =>{
 
                 const expensesArray = allUserData.filter((expense)=>{
                     
-                    //we will compare these 2 values
+                    //filter data
+                    //if data is from this month keep it
+                    //if data is from a past month, but has recurring true keep it
+                    //anything else will be removed
                     const dateOfCreation = new Date(expense.createdAt)
-                    const dateOfUpdate = new Date(expense.updatedAt)
-                    console.log(expense, )
+                    const recurring = expense.recurring
 
-                    if(expense.type !== "expense"){}
-                    
-                    return expense.type === "expense"
+                    if(expense.type === "expense"){
+                        if(dateOfCreation.getMonth() + 1 === todaysDate.getMonth() + 1 && dateOfCreation.getFullYear() === todaysDate.getFullYear()){
+                            return expense
+                        }else if(recurring === true){
+                            return expense
+                        }
+                    }
                 })
+
                 const incomesArray = allUserData.filter((income)=>{
-                    return income.type === "income"
+                    const dateOfCreation = new Date(income.createdAt)
+                    const recurring = income.recurring
+
+                    if(income.type === "income"){
+                        if(dateOfCreation.getMonth() + 1 === todaysDate.getMonth() + 1 && dateOfCreation.getFullYear() === todaysDate.getFullYear()){
+                            return income
+                        }else if(recurring === true){
+                            return income
+                        }
+                    }
                 })
                 //console.log(incomesArray, expensesArray)
 
-                const chartSettings = {
+                const expenseChartSettings = {
                     type: "doughnut",
                     data: {
                         datasets: [{
                             //THE CUSTOM DATA
-                            data: [100, 30, 80, 50, 40, 70, 10],
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: "40%",
+                        hover:{
+                            mode: null
+                        },
+                        plugins:{
+                            tooltip: {
+                                enabled: false
+                            },
+                            legend: {
+                                display: false,
+                            }
+                        },
+                        layout:{
+                            padding:{
+                                left: 0,
+                                right: 0,
+                                top: 20,
+                                bottom: 15
+                            }
+                        },
+                    },
+                    plugins: []
+                }
+                const incomeChartSettings = {
+                    type: "doughnut",
+                    data: {
+                        datasets: [{
+                            //THE CUSTOM DATA
                         }]
                     },
                     options: {
@@ -981,6 +1061,30 @@ const CORE_FUNCTION = (data, token) =>{
 
                 //IF WE HAVE DATA FOR A CHART CREATE ONE
                 if(expensesArray.length){
+                    //reducing the data, if many duplicates 
+                    const arrayDataReduce = expensesArray.reduce((acc, curr) =>{
+                        if(acc[curr.typeofExpenseIncome]){
+                            acc[curr.typeofExpenseIncome] += curr.amount
+                        }else{
+                            acc[curr.typeofExpenseIncome] = curr.amount
+                        }
+
+                        return acc
+                    }, {})
+                    const reducedDataObject = arrayDataReduce
+
+                    const labels = Object.keys(reducedDataObject)
+                    const dataAmount = Object.values(reducedDataObject)
+
+                    //console.log(labels, dataAmount)
+
+                    //shallow copy of the settings
+                    expenseChartSettings.data.datasets = [{
+                        data: dataAmount,
+                        backgroundColor: getColorForLabel(labels)
+                    }]
+                    expenseChartSettings.data.labels = labels
+
                     EXPENSES_DONUT_ELEMENT.innerHTML = `
                     <span class="expense absolute-chart-text">EXPENSES</span>
                     <div class="chart-wrapper">
@@ -991,7 +1095,17 @@ const CORE_FUNCTION = (data, token) =>{
 
                     const expenseCanvas = document.querySelector("#expenseDonutChart").getContext("2d")
                     //execution of the chart
-                    const expenseChart = new Chart(expenseCanvas, chartSettings)
+                    const expenseChart = new Chart(expenseCanvas, expenseChartSettings)
+
+                    EXPENSES_DONUT_ELEMENT.addEventListener("click", (e)=>{
+                        e.stopPropagation()
+
+                        document.body.style.overflow = "hidden"
+                        ADDITIONAL_ELEMENT.classList.add("show")
+
+                        createExpenseChart(expensesArray)
+                    }, {once:true})
+
                 }else{
                     EXPENSES_DONUT_ELEMENT.innerHTML = `
                     <span class="empty-donut">You don't have any expenses!</span>
@@ -1007,17 +1121,51 @@ const CORE_FUNCTION = (data, token) =>{
                         ADDITIONAL_ELEMENT.classList.add("show")
     
                         creatingExpense()
-                    })
+                    }, {once:true})
                 }
 
                 if(incomesArray.length){
+                    const arrayDataReduce = incomesArray.reduce((acc, curr) =>{
+                        if(acc[curr.typeofExpenseIncome]){
+                            acc[curr.typeofExpenseIncome] += curr.amount
+                        }else{
+                            acc[curr.typeofExpenseIncome] = curr.amount
+                        }
+
+                        return acc
+                    }, {})
+                    const reducedDataObject = arrayDataReduce
+
+                    const labels = Object.keys(reducedDataObject)
+                    const dataAmount = Object.values(reducedDataObject)
+
+                    //console.log(labels, dataAmount)
+
+                    incomeChartSettings.data.datasets = [{
+                        data: dataAmount,
+                        backgroundColor: getColorForLabel(labels)
+                    }]
+                    incomeChartSettings.data.labels = labels
+                    
                     INCOME_DONUT_ELEMENT.innerHTML = `
-                    <span class="expense absolute-chart-text">INCOMES</span>
+                    <span class="income absolute-chart-text">INCOMES</span>
                     <div class="chart-wrapper">
                         <canvas aria-label="Donut chart displaying incomes you have this month" role="img"  id="incomeDonutChart"></canvas>
                     </div>
                     <span class="absolute-show-more">Show More</span>
                     `
+                    const incomeCanvas = document.querySelector("#incomeDonutChart").getContext("2d")
+                    //execution of the chart
+                    const incomeChart = new Chart(incomeCanvas, incomeChartSettings)
+
+                    INCOME_DONUT_ELEMENT.addEventListener("click", (e)=>{
+                        e.stopPropagation()
+
+                        document.body.style.overflow = "hidden"
+                        ADDITIONAL_ELEMENT.classList.add("show")
+
+                        createIncomeChart(incomesArray)
+                    })
 
                 }else{
                     INCOME_DONUT_ELEMENT.innerHTML = `
@@ -1053,21 +1201,26 @@ const CORE_FUNCTION = (data, token) =>{
                 </div>
                 `
 
-                EXPENSES_DONUT_ELEMENT.addEventListener("click", (e)=>{
+                EXPENSES_DONUT_ELEMENT.addEventListener("click", ()=>{
                     e.stopPropagation()
-
+    
                     document.body.style.overflow = "hidden"
                     ADDITIONAL_ELEMENT.classList.add("show")
-
+    
                     creatingExpense()
-                })
+                    
+                }, {once:true})
                 INCOME_DONUT_ELEMENT.addEventListener("click", (e)=>{
                     e.stopPropagation()
-
+    
                     document.body.style.overflow = "hidden"
                     ADDITIONAL_ELEMENT.classList.add("show")
-
-                    creatingIncome()
+    
+                    if(expenseData.data){
+    
+                    }else{
+                        creatingIncome()
+                    }
                 })
             }
         }

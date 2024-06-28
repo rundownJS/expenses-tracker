@@ -560,6 +560,6 @@ input#income-amount::-webkit-inner-spin-button, input#income-amount::-webkit-out
     right: 10px;
 }
 
-.expense-donut:hover .absolute-show-more{
+.expense-donut:hover .absolute-show-more, .income-donut:hover .absolute-show-more{
     opacity: 1;
 }
