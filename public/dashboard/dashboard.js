@@ -922,21 +922,21 @@ const CORE_FUNCTION = (data, token) =>{
 
             //if there is in fact data restructure
             //STARTING CHARTS
-            //GET FAMILIAR WITH CHARTJS ONCE AGAIN
             if(expenseData.data){
                 //SET THE DATA ARRAY USED FOR THE CHART
-                EXPENSES_DONUT_ELEMENT.innerHTML = `
-                <div class="chart-wrapper">
-                    <canvas aria-label="Donut chart displaying expenses you have this month" role="img"  id="expenseDonutChart"></canvas>
-                </div>
-                `
-                //inital chart set
-                //THIS IS TEST ONLY, THE REAL CHART WOULD USE A MODIFIED DATA
-                const expenseCanvas = document.querySelector("#expenseDonutChart").getContext("2d")
-
                 //CUSTOM DATA
                 const allUserData = expenseData.data
+                const todaysDate = new Date(Date.now())
+
                 const expensesArray = allUserData.filter((expense)=>{
+                    
+                    //we will compare these 2 values
+                    const dateOfCreation = new Date(expense.createdAt)
+                    const dateOfUpdate = new Date(expense.updatedAt)
+                    console.log(expense, )
+
+                    if(expense.type !== "expense"){}
+                    
                     return expense.type === "expense"
                 })
                 const incomesArray = allUserData.filter((income)=>{
@@ -979,8 +979,63 @@ const CORE_FUNCTION = (data, token) =>{
                     plugins: []
                 }
 
-                //execution of the chart
-                const expenseChart = new Chart(expenseCanvas, chartSettings)
+                //IF WE HAVE DATA FOR A CHART CREATE ONE
+                if(expensesArray.length){
+                    EXPENSES_DONUT_ELEMENT.innerHTML = `
+                    <span class="expense absolute-chart-text">EXPENSES</span>
+                    <div class="chart-wrapper">
+                        <canvas aria-label="Donut chart displaying expenses you have this month" role="img"  id="expenseDonutChart"></canvas>
+                    </div>
+                    <span class="absolute-show-more">Show More</span>
+                    `
+
+                    const expenseCanvas = document.querySelector("#expenseDonutChart").getContext("2d")
+                    //execution of the chart
+                    const expenseChart = new Chart(expenseCanvas, chartSettings)
+                }else{
+                    EXPENSES_DONUT_ELEMENT.innerHTML = `
+                    <span class="empty-donut">You don't have any expenses!</span>
+                    <div class="add-expense">
+                        <span>Add One</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
+                    </div>
+                    `
+                    EXPENSES_DONUT_ELEMENT.addEventListener("click", (e)=>{
+                        e.stopPropagation()
+    
+                        document.body.style.overflow = "hidden"
+                        ADDITIONAL_ELEMENT.classList.add("show")
+    
+                        creatingExpense()
+                    })
+                }
+
+                if(incomesArray.length){
+                    INCOME_DONUT_ELEMENT.innerHTML = `
+                    <span class="expense absolute-chart-text">INCOMES</span>
+                    <div class="chart-wrapper">
+                        <canvas aria-label="Donut chart displaying incomes you have this month" role="img"  id="incomeDonutChart"></canvas>
+                    </div>
+                    <span class="absolute-show-more">Show More</span>
+                    `
+
+                }else{
+                    INCOME_DONUT_ELEMENT.innerHTML = `
+                    <span class="empty-donut">You don't have any income!</span>
+                    <div class="add-income">
+                        <span>Add One</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
+                    </div>
+                    `
+                    INCOME_DONUT_ELEMENT.addEventListener("click", (e)=>{
+                        e.stopPropagation()
+
+                        document.body.style.overflow = "hidden"
+                        ADDITIONAL_ELEMENT.classList.add("show")
+
+                        creatingIncome()
+                    })
+                }
                 
             }else{
                 EXPENSES_DONUT_ELEMENT.innerHTML = `

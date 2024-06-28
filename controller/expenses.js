@@ -66,18 +66,41 @@ const getOneExpenseIncome = async (req, res) =>{
 //update a ceratin expense/ income by id
 const updateExpenseIncome = async (req, res) =>{
     
-    const updateBody = req.body.updateBody
+    const { type, typeofExpenseIncome, subtypeofExpenseIncome, recurring, amount } = req.body
     const documentID = req.body.documentid
 
-    if(!updateBody){
-        return res.status(400).json({ msg: "Invalid update data" })
-    }
+    const queryObject = {}
+
     if(!documentID){
         return res.status(400).json({ msg: "Provide a valid expense/ income ID" })
     }
 
+    if(type){
+        queryObject.type = type
+    }
+    if(typeofExpenseIncome){
+        queryObject.typeofExpenseIncome = typeofExpenseIncome
+    }
+    if(subtypeofExpenseIncome){
+        queryObject.subtypeofExpenseIncome = subtypeofExpenseIncome
+    }
+    if(typeof recurring === "boolean"){
+        queryObject.recurring = recurring
+    }
+    if(amount){
+        queryObject.amount = amount
+    }
+
+    const checkIfEmpty = (obj) =>{
+        return Object.keys(obj).length === 0
+    }
+
+    if(checkIfEmpty(queryObject)){
+        return res.status(400).json({ msg: "No data to update" })
+    }
+
     //id, fields to update, options (VERY IMPORTANT) return the new, run validators
-    const updateData = await Expenses.findByIdAndUpdate( documentID, updateBody, {new:true, runValidators: true} )
+    const updateData = await Expenses.findByIdAndUpdate( documentID, queryObject, {new:true, runValidators: true} )
 
     if(!updateData){
         return res.status(400).json({ msg: `Could not update data with ID ${documentID}` })

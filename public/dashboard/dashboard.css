@@ -109,6 +109,7 @@ body{
     flex-direction: column;
     cursor: pointer;
     transition: 150ms ease;
+    position: relative;
 }
 .expense-donut:hover, .income-donut:hover{
     box-shadow:  8px 8px 16px rgba(0, 0, 0, 0.3);
@@ -534,4 +535,31 @@ input#income-amount::-webkit-inner-spin-button, input#income-amount::-webkit-out
 .chart-wrapper{
     width: 100%;
     height: 100%;
+}
+.absolute-chart-text{
+    position: absolute;
+    font-size: 1.2rem;
+    font-weight: 500;
+    top: 2px;
+    left: 10px;
+}
+.absolute-chart-text.expense{
+    color: rgb(255, 0, 0);
+}
+.absolute-chart-text.income{
+    color: rgb(0, 175, 0);
+}
+
+.absolute-show-more{
+    position: absolute;
+    font-size: 0.9rem;
+    color: #b7b7b7;
+    opacity: 0;
+    transition: 150ms linear;
+    bottom: 2px;
+    right: 10px;
+}
+
+.expense-donut:hover .absolute-show-more{
+    opacity: 1;
 }

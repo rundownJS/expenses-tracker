@@ -1,5 +1,6 @@
 const mongoose = require("mongoose")
 const { BadRequestError, NotFoundError } = require("../errors")
+const _ = require("lodash")
 
 //if the user wants to add an expense/income limit the options
 const expenseIncomeOptions = {
@@ -85,12 +86,18 @@ const ExpensesSchema = new mongoose.Schema({
         type: Date,
         default: Date.now(),
         immutable: true
+    },
+    history: {
+        changes: [mongoose.Schema.Types.Mixed]
     }
 
 }, {timestamps: true})
 
+
+
 //check validators again before updating
 //this is done to prevent mistakes when updating data
+//also change the history property 
 ExpensesSchema.pre("findOneAndUpdate", async function(next){
     
     const update = this.getUpdate()
@@ -102,8 +109,11 @@ ExpensesSchema.pre("findOneAndUpdate", async function(next){
         throw new NotFoundError("Document not found")
     }
 
+    //capture the original before the update
+    const originalDoc = docToUpdate.toObject()
+
     // Merge the update into the current document
-    const mergedDoc = { ...docToUpdate.toObject(), ...update }
+    const mergedDoc = { ...originalDoc, ...update }
 
     // Validate the merged document
     if(!["expense", "income"].includes(mergedDoc.type)){
@@ -130,6 +140,25 @@ ExpensesSchema.pre("findOneAndUpdate", async function(next){
     if(typeof mergedDoc.recurring !== "boolean"){
         throw new BadRequestError("Recurring can only be 'true' or 'false'")
     }
+
+    //see what changes are made
+    const changes = {}
+    Object.keys(update).forEach(key =>{
+        if(this.schema.paths[key]){
+            if(!_.isEqual(originalDoc[key], update[key])){
+                changes[key] = {
+                    old: originalDoc[key],
+                    new: update[key]
+                }
+            }
+        }
+    })
+
+    //update the history property
+    docToUpdate.history.changes = []
+    docToUpdate.history.changes.push(changes)
+
+    await docToUpdate.save()
 
     next()
 })
