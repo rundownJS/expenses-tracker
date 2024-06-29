@@ -916,7 +916,187 @@ const CORE_FUNCTION = (data, token) =>{
             }  
             //USER CLICKS THE ELEMENT WITH DATA
             const createExpenseChart = (chartData) =>{
-                console.log(chartData)
+                ADDITIONAL_ELEMENT.innerHTML = `
+                <div class="parent">
+                    <div class="chart-breakdown-wrapper">
+                        <span class="breakdown-title">In-Depth Expenses Breakdown</span>
+
+                        <div class="bigger-chart-wrapper">
+                            <canvas id="biggerExpense" role="image" aria-label="Donut chart displaying expenses you have this month"></canvas>
+                        </div>
+
+                        <div class="breakdown-addNew">
+                            <div class="chart-breakdown"></div>
+                        </div>
+                    </div>
+                </div>
+                `
+                const chartSettings = {}
+                const chartCanvas = document.querySelector("#biggerExpense").getContext("2d")
+                //const expenseChart = new Chart(chartCanvas, chartSettings)
+
+                const BREAKDOWN_WRAPPER = document.querySelector(".chart-breakdown")
+
+                //console.log(chartData)
+                //if there are repetitions of a certain expense add them together => housing => rent = all rent expenses, housing => mortgage
+                //get the category amount % from the whole chart
+                //get the certain expense amount % from the category 
+
+                //the whole expense amount
+                const total_amount = chartData.reduce((acc, curr) =>{
+                    return acc + curr.amount
+                }, 0)
+                BREAKDOWN_WRAPPER.innerHTML = `<span class="total">Total Expenses This Month: ${Number(total_amount).toLocaleString("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                    maximumFractionDigits: 2,
+                    minimumFractionDigits: 2
+                })}</span>`
+                
+                //category breakdown
+                const all_expenses_breakdown_OBJECT = chartData.reduce((acc, curr) =>{
+                    const { typeofExpenseIncome, subtypeofExpenseIncome, amount } = curr
+
+                    if(!acc[typeofExpenseIncome]){
+                        acc[typeofExpenseIncome] = {}
+                    }
+
+                    if(!acc[typeofExpenseIncome][subtypeofExpenseIncome]){
+                        acc[typeofExpenseIncome][subtypeofExpenseIncome] = 0
+                    }
+
+                    acc[typeofExpenseIncome][subtypeofExpenseIncome] += amount
+
+                    return acc
+                }, {})
+                const all_expenses_breakdown_ARRAY = Object.entries(all_expenses_breakdown_OBJECT).map(([category, expenses]) =>{
+                    const expenseEntries = Object.entries(expenses).map(([expense, amount]) => ({
+                        expense,
+                        amount 
+                    }))
+
+                    const totalAmount = expenseEntries.reduce((sum, { amount }) => sum + amount, 0)
+
+                    return {
+                        category,
+                        expenses: expenseEntries,
+                        totalAmount
+                    }
+                })
+                //console.log(all_expenses_breakdown_ARRAY)
+
+
+                //the categories straight from the db are not text ready
+                //function will modify them
+                const formatCategory = (str) =>{
+                    const strSplit = str.split("_")
+
+                    if(strSplit.length > 1){
+                        if(strSplit[0] === "health"){
+                            return strSplit.map(word =>{
+                                return word.charAt(0).toUpperCase() + word.slice(1)
+                            }).join(" & ")
+                        }else{
+                            return strSplit.map(word =>{
+                                return word.charAt(0).toUpperCase() + word.slice(1)
+                            }).join(" ")
+                        }
+                    }else{
+                        return strSplit[0].charAt(0).toUpperCase() + strSplit[0].slice(1)
+                    }
+                }
+                const formatExpense = (str) =>{
+                    const words = str.split(/(\s+|\(|\)|\/|,)/)
+
+                    //const wordCount = words.filter(word => /\w/.test(word)).length
+
+                    for(let i = 0; i < words.length; i++){
+                        if (/\w/.test(words[i])){
+                            words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1)
+                        }
+                    }
+                    
+                    return words.join("")
+                }
+                
+                //use the array to loop and create elements
+                for(let i = 0; i < all_expenses_breakdown_ARRAY.length; i++){
+
+                    //create the catgory element
+                    const mainCategoryBreakdown = document.createElement("span")
+                    mainCategoryBreakdown.classList.add("category-breakdown-text")
+                    BREAKDOWN_WRAPPER.appendChild(mainCategoryBreakdown)
+
+                    const category = all_expenses_breakdown_ARRAY[i].category //category name
+                    const categoryAmount = all_expenses_breakdown_ARRAY[i].totalAmount //category amount
+
+                    //find the percentage
+                    let categoryPercentage = Number((categoryAmount / total_amount) * 100).toFixed(2)
+                    if(categoryPercentage === "0.00"){
+                        categoryPercentage = "< 0.01"
+                    }
+
+                    mainCategoryBreakdown.textContent = `${formatCategory(category)}: ${Number(categoryAmount).toLocaleString("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 2
+                    })} (${categoryPercentage}%)`
+
+                    //the expenses the category consists of
+                    for(let j = 0; j < all_expenses_breakdown_ARRAY[i].expenses.length; j++){
+                        const expense = all_expenses_breakdown_ARRAY[i].expenses[j].expense
+
+                        const expenseAmount = all_expenses_breakdown_ARRAY[i].expenses[j].amount
+
+                        const expenseBreakdown = document.createElement("span")
+                        expenseBreakdown.classList.add("expense-breakdown-text")
+
+                        let expensePercentage = Number((expenseAmount / categoryAmount) * 100).toFixed(2)
+                        if(expensePercentage === "0.00"){
+                            expensePercentage = "< 0.01"
+                        }
+
+                        expenseBreakdown.textContent = `${formatExpense(expense)}: ${Number(expenseAmount).toLocaleString("en-US", {
+                            style: "currency",
+                            currency: "USD",
+                            maximumFractionDigits: 2,
+                            minimumFractionDigits: 2
+                        })}, (${expensePercentage}%)`
+
+                        BREAKDOWN_WRAPPER.appendChild(expenseBreakdown)
+                    }
+                    //console.log(formatCategory(all_expenses_breakdown_ARRAY[i].category))
+                }
+
+
+                const parent = document.querySelector(".parent")
+                parent.classList.add("show")
+
+                parent.addEventListener("click", (e)=>{
+                    e.stopPropagation()
+                })
+
+                //WINDOW EVENT CLOSING EVERYTHING
+                window.addEventListener("click", ()=>{
+                    if(parent.classList.contains("show")){
+                        parent.classList.remove("show")
+                        parent.classList.add("hide")
+    
+                        ADDITIONAL_ELEMENT.classList.remove("show")
+                        ADDITIONAL_ELEMENT.classList.add("hide")
+    
+                        parent.addEventListener("animationend", ()=>{
+                            parent.classList.remove("hide")
+                            ADDITIONAL_ELEMENT.classList.remove("hide")
+                            document.body.style.overflow = "auto"
+
+                            ADDITIONAL_ELEMENT.innerHTML =``
+                        })
+
+                        donutsChartSet()
+                    }
+                })
             }          
             const createIncomeChart = () =>{
                 
@@ -1165,7 +1345,7 @@ const CORE_FUNCTION = (data, token) =>{
                         ADDITIONAL_ELEMENT.classList.add("show")
 
                         createIncomeChart(incomesArray)
-                    })
+                    }, {once: true})
 
                 }else{
                     INCOME_DONUT_ELEMENT.innerHTML = `
@@ -1182,7 +1362,7 @@ const CORE_FUNCTION = (data, token) =>{
                         ADDITIONAL_ELEMENT.classList.add("show")
 
                         creatingIncome()
-                    })
+                    }, {once:true})
                 }
                 
             }else{
@@ -1216,12 +1396,9 @@ const CORE_FUNCTION = (data, token) =>{
                     document.body.style.overflow = "hidden"
                     ADDITIONAL_ELEMENT.classList.add("show")
     
-                    if(expenseData.data){
-    
-                    }else{
-                        creatingIncome()
-                    }
-                })
+                    creatingIncome()
+                    
+                }, {once:true})
             }
         }
         donutsChartSet()
@@ -1230,7 +1407,7 @@ const CORE_FUNCTION = (data, token) =>{
 
     PAGE_CONTENT.innerHTML = `
         <div class="dashboard">
-            <span class="username">Welcome back, <span class="bolder">${data.data.name}!</span> </span>
+            <span class="username">Welcome back, <span class="bolder">${data.data.name}</span>! </span>
             <div class="core-elements-wrapper">
                 <div class="bar-donut-wrapper">
                     <div class="bar-chart-element"></div>

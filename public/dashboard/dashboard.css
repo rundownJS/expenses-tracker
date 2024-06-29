@@ -563,3 +563,8 @@ input#income-amount::-webkit-inner-spin-button, input#income-amount::-webkit-out
 .expense-donut:hover .absolute-show-more, .income-donut:hover .absolute-show-more{
     opacity: 1;
 }
+
+.chart-breakdown{
+    display: flex;
+    flex-direction: column;
+}
