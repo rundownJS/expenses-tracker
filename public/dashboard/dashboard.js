@@ -133,6 +133,7 @@ const CORE_FUNCTION = (data, token) =>{
         }
         barChartSet()
 
+        //FULLY DONE
         const donutsChartSet = () =>{
             //CANCEL BUTTON EVENT
             const creatingExpense = () =>{
@@ -220,6 +221,7 @@ const CORE_FUNCTION = (data, token) =>{
                     </div>
                 </div>
                 `
+                ADDITIONAL_ELEMENT.style.alignItems = "center"
 
                 //ERROR SPANS
                 const amount_error = document.querySelector(".error-text.number")
@@ -349,6 +351,8 @@ const CORE_FUNCTION = (data, token) =>{
 
                             ADDITIONAL_ELEMENT.innerHTML =``
                         })
+
+                        donutsChartSet()
                     }
                 })
 
@@ -611,6 +615,7 @@ const CORE_FUNCTION = (data, token) =>{
                     </div>
                 </div>
                 `
+                ADDITIONAL_ELEMENT.style.alignItems = "center"
 
                 //ERROR SPANS
                 const amount_error = document.querySelector(".error-text.number")
@@ -736,6 +741,7 @@ const CORE_FUNCTION = (data, token) =>{
 
                             ADDITIONAL_ELEMENT.innerHTML =``
                         })
+                        donutsChartSet()
                     }
                 })
 
@@ -848,6 +854,7 @@ const CORE_FUNCTION = (data, token) =>{
 
                             ADDITIONAL_ELEMENT.innerHTML =``
                         })
+                        donutsChartSet()
                     }
                 })
 
@@ -927,13 +934,68 @@ const CORE_FUNCTION = (data, token) =>{
 
                         <div class="breakdown-addNew">
                             <div class="chart-breakdown"></div>
+                            <div class="buttons-wrapper">
+                                <div class="close">Close</div>
+                                <div class="add-new-expense">
+                                    <span>Add New</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"></path></svg>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 `
-                const chartSettings = {}
+                const arrayDataReduce = chartData.reduce((acc, curr) =>{
+                    if(acc[curr.typeofExpenseIncome]){
+                        acc[curr.typeofExpenseIncome] += curr.amount
+                    }else{
+                        acc[curr.typeofExpenseIncome] = curr.amount
+                    }
+
+                    return acc
+                }, {})
+                const reducedDataObject = arrayDataReduce
+
+                const labels = Object.keys(reducedDataObject)
+                const dataAmount = Object.values(reducedDataObject)
+                const chartSettings = {
+                    type: "doughnut",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            //THE CUSTOM DATA
+                            data: dataAmount,
+                            backgroundColor: getColorForLabel(labels)
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: "40%",
+                        hover:{
+                            mode: null
+                        },
+                        plugins:{
+                            tooltip: {
+                                enabled: false
+                            },
+                            legend: {
+                                display: false,
+                            }
+                        },
+                        layout:{
+                            padding:{
+                                left: 0,
+                                right: 0,
+                                top: 20,
+                                bottom: 15
+                            }
+                        },
+                    },
+                    plugins: []
+                }
                 const chartCanvas = document.querySelector("#biggerExpense").getContext("2d")
-                //const expenseChart = new Chart(chartCanvas, chartSettings)
+                const expenseChart = new Chart(chartCanvas, chartSettings)
 
                 const BREAKDOWN_WRAPPER = document.querySelector(".chart-breakdown")
 
@@ -1023,7 +1085,7 @@ const CORE_FUNCTION = (data, token) =>{
                 for(let i = 0; i < all_expenses_breakdown_ARRAY.length; i++){
 
                     //create the catgory element
-                    const mainCategoryBreakdown = document.createElement("span")
+                    const mainCategoryBreakdown = document.createElement("div")
                     mainCategoryBreakdown.classList.add("category-breakdown-text")
                     BREAKDOWN_WRAPPER.appendChild(mainCategoryBreakdown)
 
@@ -1036,12 +1098,16 @@ const CORE_FUNCTION = (data, token) =>{
                         categoryPercentage = "< 0.01"
                     }
 
-                    mainCategoryBreakdown.textContent = `${formatCategory(category)}: ${Number(categoryAmount).toLocaleString("en-US", {
+                    mainCategoryBreakdown.innerHTML = `
+                    <div style="background-color: ${CUSTOM_COLORS[category]}" class="color"></div>
+                    <span>${formatCategory(category)}: ${Number(categoryAmount).toLocaleString("en-US", {
                         style: "currency",
                         currency: "USD",
                         maximumFractionDigits: 2,
                         minimumFractionDigits: 2
-                    })} (${categoryPercentage}%)`
+                    })} (${categoryPercentage}%)</span>
+                    `
+                    //console.log(category)
 
                     //the expenses the category consists of
                     for(let j = 0; j < all_expenses_breakdown_ARRAY[i].expenses.length; j++){
@@ -1069,13 +1135,19 @@ const CORE_FUNCTION = (data, token) =>{
                     //console.log(formatCategory(all_expenses_breakdown_ARRAY[i].category))
                 }
 
-
                 const parent = document.querySelector(".parent")
                 parent.classList.add("show")
 
                 parent.addEventListener("click", (e)=>{
                     e.stopPropagation()
                 })
+
+                if(parent.clientHeight >= window.innerHeight - 40){
+                    ADDITIONAL_ELEMENT.style.alignItems = "baseline"
+                    ADDITIONAL_ELEMENT.style.overflowY = "auto"
+                }else{
+                    ADDITIONAL_ELEMENT.style.alignItems = "center"
+                }
 
                 //WINDOW EVENT CLOSING EVERYTHING
                 window.addEventListener("click", ()=>{
@@ -1092,14 +1164,312 @@ const CORE_FUNCTION = (data, token) =>{
                             document.body.style.overflow = "auto"
 
                             ADDITIONAL_ELEMENT.innerHTML =``
+                            ADDITIONAL_ELEMENT.style.overflowY = "hidden"
                         })
 
                         donutsChartSet()
                     }
                 })
+
+                const closeButton = document.querySelector(".close")
+                closeButton.addEventListener("click", ()=>{
+                    if(parent.classList.contains("show")){
+                        parent.classList.remove("show")
+                        parent.classList.add("hide")
+    
+                        ADDITIONAL_ELEMENT.classList.remove("show")
+                        ADDITIONAL_ELEMENT.classList.add("hide")
+    
+                        parent.addEventListener("animationend", ()=>{
+                            parent.classList.remove("hide")
+                            ADDITIONAL_ELEMENT.classList.remove("hide")
+                            document.body.style.overflow = "auto"
+
+                            ADDITIONAL_ELEMENT.innerHTML =``
+                        })
+                        donutsChartSet()
+                    }
+                })
+
+                const createNewButton = document.querySelector(".add-new-expense")
+                createNewButton.addEventListener("click", ()=>{
+                    creatingExpense()
+                })
             }          
-            const createIncomeChart = () =>{
+            const createIncomeChart = (chartData) =>{
+                ADDITIONAL_ELEMENT.innerHTML = `
+                <div class="parent">
+                    <div class="chart-breakdown-wrapper">
+                        <span class="breakdown-title">In-Depth Income Breakdown</span>
+
+                        <div class="bigger-chart-wrapper">
+                            <canvas id="biggerIncome" role="image" aria-label="Donut chart displaying expenses you have this month"></canvas>
+                        </div>
+
+                        <div class="breakdown-addNew">
+                            <div class="chart-breakdown"></div>
+                            <div class="buttons-wrapper">
+                                <div class="close">Close</div>
+                                <div class="add-new-income">
+                                    <span>Add New</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"></path></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `
+                const arrayDataReduce = chartData.reduce((acc, curr) =>{
+                    if(acc[curr.typeofExpenseIncome]){
+                        acc[curr.typeofExpenseIncome] += curr.amount
+                    }else{
+                        acc[curr.typeofExpenseIncome] = curr.amount
+                    }
+
+                    return acc
+                }, {})
+                const reducedDataObject = arrayDataReduce
+
+                const labels = Object.keys(reducedDataObject)
+                const dataAmount = Object.values(reducedDataObject)
+                const chartSettings = {
+                    type: "doughnut",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            //THE CUSTOM DATA
+                            data: dataAmount,
+                            backgroundColor: getColorForLabel(labels)
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: "40%",
+                        hover:{
+                            mode: null
+                        },
+                        plugins:{
+                            tooltip: {
+                                enabled: false
+                            },
+                            legend: {
+                                display: false,
+                            }
+                        },
+                        layout:{
+                            padding:{
+                                left: 0,
+                                right: 0,
+                                top: 20,
+                                bottom: 15
+                            }
+                        },
+                    },
+                    plugins: []
+                }
+                const chartCanvas = document.querySelector("#biggerIncome").getContext("2d")
+                const expenseChart = new Chart(chartCanvas, chartSettings)
+
+                const BREAKDOWN_WRAPPER = document.querySelector(".chart-breakdown")
+
+                //console.log(chartData)
+                //if there are repetitions of a certain expense add them together => housing => rent = all rent expenses, housing => mortgage
+                //get the category amount % from the whole chart
+                //get the certain expense amount % from the category 
+
+                //the whole expense amount
+                const total_amount = chartData.reduce((acc, curr) =>{
+                    return acc + curr.amount
+                }, 0)
+                BREAKDOWN_WRAPPER.innerHTML = `<span class="total">Total Income This Month: ${Number(total_amount).toLocaleString("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                    maximumFractionDigits: 2,
+                    minimumFractionDigits: 2
+                })}</span>`
                 
+                //category breakdown
+                const all_incomes_breakdown_OBJECT = chartData.reduce((acc, curr) =>{
+                    const { typeofExpenseIncome, subtypeofExpenseIncome, amount } = curr
+
+                    if(!acc[typeofExpenseIncome]){
+                        acc[typeofExpenseIncome] = {}
+                    }
+
+                    if(!acc[typeofExpenseIncome][subtypeofExpenseIncome]){
+                        acc[typeofExpenseIncome][subtypeofExpenseIncome] = 0
+                    }
+
+                    acc[typeofExpenseIncome][subtypeofExpenseIncome] += amount
+
+                    return acc
+                }, {})
+                const all_incomes_breakdown_ARRAY = Object.entries(all_incomes_breakdown_OBJECT).map(([category, incomes]) =>{
+                    const incomesEntries = Object.entries(incomes).map(([income, amount]) => ({
+                        income,
+                        amount 
+                    }))
+
+                    const totalAmount = incomesEntries.reduce((sum, { amount }) => sum + amount, 0)
+
+                    return {
+                        category,
+                        incomes: incomesEntries,
+                        totalAmount
+                    }
+                })
+                //console.log(all_expenses_breakdown_ARRAY)
+
+
+                //the categories straight from the db are not text ready
+                //function will modify them
+                const formatCategory = (str) =>{
+                    const strSplit = str.split("_")
+
+                    if(strSplit.length > 1){
+                        if(strSplit[0] === "health"){
+                            return strSplit.map(word =>{
+                                return word.charAt(0).toUpperCase() + word.slice(1)
+                            }).join(" & ")
+                        }else{
+                            return strSplit.map(word =>{
+                                return word.charAt(0).toUpperCase() + word.slice(1)
+                            }).join(" ")
+                        }
+                    }else{
+                        return strSplit[0].charAt(0).toUpperCase() + strSplit[0].slice(1)
+                    }
+                }
+                const formatExpense = (str) =>{
+                    const words = str.split(/(\s+|\(|\)|\/|,)/)
+
+                    //const wordCount = words.filter(word => /\w/.test(word)).length
+
+                    for(let i = 0; i < words.length; i++){
+                        if (/\w/.test(words[i])){
+                            words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1)
+                        }
+                    }
+                    
+                    return words.join("")
+                }
+                
+                //use the array to loop and create elements
+                for(let i = 0; i < all_incomes_breakdown_ARRAY.length; i++){
+
+                    //create the catgory element
+                    const mainCategoryBreakdown = document.createElement("div")
+                    mainCategoryBreakdown.classList.add("category-breakdown-text")
+                    BREAKDOWN_WRAPPER.appendChild(mainCategoryBreakdown)
+
+                    const category = all_incomes_breakdown_ARRAY[i].category //category name
+                    const categoryAmount = all_incomes_breakdown_ARRAY[i].totalAmount //category amount
+
+                    //find the percentage
+                    let categoryPercentage = Number((categoryAmount / total_amount) * 100).toFixed(2)
+                    if(categoryPercentage === "0.00"){
+                        categoryPercentage = "< 0.01"
+                    }
+
+                    mainCategoryBreakdown.innerHTML = `
+                    <div style="background-color: ${CUSTOM_COLORS[category]}" class="color"></div>
+                    <span>${formatCategory(category)}: ${Number(categoryAmount).toLocaleString("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 2
+                    })} (${categoryPercentage}%)</span>
+                    `
+                    //console.log(category)
+
+                    //the expenses the category consists of
+                    for(let j = 0; j < all_incomes_breakdown_ARRAY[i].incomes.length; j++){
+                        const income = all_incomes_breakdown_ARRAY[i].incomes[j].income
+
+                        const incomeAmount = all_incomes_breakdown_ARRAY[i].incomes[j].amount
+
+                        const incomeBreakdown = document.createElement("span")
+                        incomeBreakdown.classList.add("income-breakdown-text")
+
+                        let incomePercentage = Number((incomeAmount / categoryAmount) * 100).toFixed(2)
+                        if(incomePercentage === "0.00"){
+                            incomePercentage = "< 0.01"
+                        }
+
+                        incomeBreakdown.textContent = `${formatExpense(income)}: ${Number(incomeAmount).toLocaleString("en-US", {
+                            style: "currency",
+                            currency: "USD",
+                            maximumFractionDigits: 2,
+                            minimumFractionDigits: 2
+                        })}, (${incomePercentage}%)`
+
+                        BREAKDOWN_WRAPPER.appendChild(incomeBreakdown)
+                    }
+                    //console.log(formatCategory(all_expenses_breakdown_ARRAY[i].category))
+                }
+
+                const parent = document.querySelector(".parent")
+                parent.classList.add("show")
+
+                parent.addEventListener("click", (e)=>{
+                    e.stopPropagation()
+                })
+
+                if(parent.clientHeight >= window.innerHeight - 40){
+                    ADDITIONAL_ELEMENT.style.alignItems = "baseline"
+                    ADDITIONAL_ELEMENT.style.overflowY = "auto"
+                }else{
+                    ADDITIONAL_ELEMENT.style.alignItems = "center"
+                }
+                //console.log(parent.clientHeight, window.innerHeight)
+
+                //WINDOW EVENT CLOSING EVERYTHING
+                window.addEventListener("click", ()=>{
+                    if(parent.classList.contains("show")){
+                        parent.classList.remove("show")
+                        parent.classList.add("hide")
+    
+                        ADDITIONAL_ELEMENT.classList.remove("show")
+                        ADDITIONAL_ELEMENT.classList.add("hide")
+    
+                        parent.addEventListener("animationend", ()=>{
+                            parent.classList.remove("hide")
+                            ADDITIONAL_ELEMENT.classList.remove("hide")
+                            document.body.style.overflow = "auto"
+
+                            ADDITIONAL_ELEMENT.innerHTML =``
+                            ADDITIONAL_ELEMENT.style.overflowY = "hidden"
+                        })
+
+                        donutsChartSet()
+                    }
+                })
+
+                const closeButton = document.querySelector(".close")
+                closeButton.addEventListener("click", ()=>{
+                    if(parent.classList.contains("show")){
+                        parent.classList.remove("show")
+                        parent.classList.add("hide")
+    
+                        ADDITIONAL_ELEMENT.classList.remove("show")
+                        ADDITIONAL_ELEMENT.classList.add("hide")
+    
+                        parent.addEventListener("animationend", ()=>{
+                            parent.classList.remove("hide")
+                            ADDITIONAL_ELEMENT.classList.remove("hide")
+                            document.body.style.overflow = "auto"
+
+                            ADDITIONAL_ELEMENT.innerHTML =``
+                        })
+                        donutsChartSet()
+                    }
+                })
+
+                const createNewButton = document.querySelector(".add-new-income")
+                createNewButton.addEventListener("click", ()=>{
+                    creatingIncome()
+                })
             }
 
 

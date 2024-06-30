@@ -192,6 +192,8 @@ body{
     opacity: 0;
     align-items: center;
     justify-content: center;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 
@@ -229,6 +231,7 @@ body{
     flex-direction: column;
     transform: translateY(50px);
     opacity: 0;
+    margin: 20px 0;
 }
 .additional-element .parent.show{
     animation: parent_visible 300ms linear forwards;
@@ -455,7 +458,7 @@ input#income-amount::-webkit-inner-spin-button, input#income-amount::-webkit-out
     justify-content: space-around;
 }
 
-.cancel, .create{
+.cancel, .create, .close{
     border-radius: 6px;
     display: flex;
     align-items: center;
@@ -468,10 +471,10 @@ input#income-amount::-webkit-inner-spin-button, input#income-amount::-webkit-out
     font-size: 1.1rem;
     user-select: none;
 }
-.cancel{
+.cancel, .close{
     background-color: #D8D8D8;
 }
-.cancel:hover{
+.cancel:hover, .close:hover{
     background-color: #c6c6c6;
 }
 .create{
@@ -567,4 +570,97 @@ input#income-amount::-webkit-inner-spin-button, input#income-amount::-webkit-out
 .chart-breakdown{
     display: flex;
     flex-direction: column;
+    margin-bottom: 30px;
+}
+.chart-breakdown-wrapper{
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 2rem;
+    width: 500px;
+}
+
+.breakdown-title{
+    font-size: 1.5rem;
+    color: #050505;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#biggerExpense, #biggerIncome{
+    width: 100%;
+}
+
+.bigger-chart-wrapper{
+    margin-bottom: 20px;
+}
+
+.chart-breakdown .total{
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #050505;
+}
+.category-breakdown-text{
+    font-size: 1rem;
+    font-weight: 500;
+    color: #050505;
+    margin-top: 20px;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.expense-breakdown-text, .income-breakdown-text{
+    font-weight: 500;
+    color: #050505;
+    padding-left: 40px;
+    font-size: 0.9rem
+}
+
+.category-breakdown-text .color{
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    border: 1px solid #D8D8D8;
+}
+
+.add-new-expense, .add-new-income{
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 150ms linear;
+    gap: 5px;
+    color: #fff;
+    user-select: none;
+    font-size: 1.1rem;
+    padding: 0 10px;
+}
+.add-new-expense svg, .add-new-income svg{
+    width: 15px;
+    height: 15px;
+    fill: #fff;
+}
+
+.add-new-expense{
+    background-color: rgb(255, 0, 0);
+}
+.add-new-income{
+    background-color: rgb(0, 175, 0);
+}
+.add-new-expense:hover{
+    background-color: rgb(232, 0, 0);
+}
+.add-new-income:hover{
+    background-color: rgb(0, 152, 0);
+}
+
+::-webkit-scrollbar{
+    width: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background: #b7b7b7;
+    border-radius: 99px;
 }
