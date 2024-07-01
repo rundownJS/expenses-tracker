@@ -123,12 +123,208 @@ const CORE_FUNCTION = (data, token) =>{
 
         const barChartSet = () =>{
 
+            //more details about the chart
+            const barMoreDetails = (incomeData, expenseData) =>{
+                console.log(incomeData, expenseData)
+            }
+
+            //custom func to determine step size
+            const stepSize = (min, max) =>{
+                return (max - min) / 10 
+            }
+
             if(expenseData.data){
-                console.log(true)
+                BAR_CHART_ELEMENT.style.paddingLeft = 0
+                BAR_CHART_ELEMENT.classList.add("more-details")
+
+                BAR_CHART_ELEMENT.innerHTML = `
+                <canvas id="bar-chart"></canvas>
+                `
+                
+                const expensesArray = expenseData.data.filter(data =>{
+                    return data.type === "expense"
+                })
+                const incomeArray = expenseData.data.filter(data =>{
+                    return data.type === "income"
+                })
+
+                const dataFilterReducer = (data) =>{
+                    const processedData = [] //we will store it here
+
+                    //compare the 2 dates
+                    const currentDate = new Date()
+                    const currentMonth = currentDate.getMonth()
+                    const currentYear = currentDate.getFullYear()
+
+                    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+
+                    //filtering
+                    data.forEach(item => {
+                        const creationDate = new Date(item.createdAt)
+                        const creationMonth = creationDate.getMonth()
+                        const creationYear = creationDate.getFullYear()
+
+                        let year = creationYear
+                        let month = creationMonth
+                        
+                        while (year < currentYear || (year === currentYear && month <= currentMonth)){
+                            processedData.push({
+                                amount: item.amount,
+                                date: `${months[month]}, ${year}`
+                            })
+
+                            if(!item.recurring){
+                                break
+                            }
+
+                            month++
+                            if(month > 11){
+                                month = 0
+                                year++
+                            }
+                        }
+                    })
+
+                    //get the total for each month
+                    const monthly_total = processedData.reduce((acc, item) =>{
+                        const key = `${item.date}`
+                        if(!acc[key]){
+                            acc[key] = { date: item.date, total_amount: 0 }
+                        }
+
+                        acc[key].total_amount += item.amount
+                        return acc
+                    }, {})
+
+                    const result = Object.values(monthly_total)
+                    return result
+                }
+                
+                //data and labels
+                const chartDataExpenses = dataFilterReducer(expensesArray).map(doc =>{
+                    return doc.total_amount
+                })
+                const chartDataIncomes = dataFilterReducer(incomeArray).map(doc =>{
+                    return doc.total_amount
+                })
+
+
+                const labels = () =>{
+                    if(dataFilterReducer(expensesArray).length > dataFilterReducer(incomeArray).length){
+                        return dataFilterReducer(expensesArray).map(doc=>{
+                            return doc.date
+                        })
+                    }else{
+                        return dataFilterReducer(incomeArray).map(doc=>{
+                            return doc.date
+                        })
+                    }
+                }
+                //console.log(labels())
+                
+                const chartSettings = {
+                    type: "bar",
+                    data: {
+                        labels: labels(),
+                        datasets: [
+                            {
+                                data: chartDataExpenses,
+                                backgroundColor: "#e80e1d",
+                                categoryPercentage: 0.6,
+                                barPercentage: 0.7,    
+                            },
+                            { 
+                                data: chartDataIncomes,
+                                backgroundColor: "#0ee82f",
+                                categoryPercentage: 0.6,
+                                barPercentage: 0.7,
+                            }
+                        ]
+                    },
+                    options: {
+                        hover:{
+                            mode: null
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                max: Math.round(((Math.max(...[...chartDataExpenses, ...chartDataIncomes])) * 1.5) / 1000) * 1000,
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(v, i, vs){
+                                        return Number(v).toLocaleString("en-US", {
+                                            style: "currency",
+                                            currency: "USD",
+                                            maximumFractionDigits: 0
+                                        })
+                                    },
+                                    font: {
+                                        family: "Poppins",
+                                        size: 12,
+                                        lineHeight: 1,
+                                    },
+                                    color: "#555555",
+                                    padding: 10,
+                                },
+                                grid: {
+                                    drawTicks: false,
+                                    color: "#D8D8D8",
+                                },
+                                border: {
+                                    color: "#D8D8D8"
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    drawTicks: false,
+                                    color: "#D8D8D8",                                },
+                                ticks: {
+                                    padding: 10,
+                                    font: {
+                                        family: "Poppins",
+                                        size: 12,
+                                        lineHeight: 1,
+                                    },
+                                    color: "#555555"
+                                },
+                                border: {
+                                    color: "#D8D8D8"
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: false
+                            },
+                            tooltip: {
+                                enabled: false
+                            }
+                        }
+                    },
+                    plugins: [] 
+                }
+
+                chartSettings.options.scales.y.ticks.stepSize = stepSize(0, chartSettings.options.scales.y.max)
+                //console.log(stepSize(0, chartSettings.options.scales.y.max))
+
+                const chartCanvas = document.querySelector("#bar-chart").getContext("2d") 
+                const barChart = new Chart(chartCanvas, chartSettings)
+
+                BAR_CHART_ELEMENT.addEventListener("click", (e)=>{
+                    
+                    if(BAR_CHART_ELEMENT.classList.contains("more-details")){
+                        e.stopPropagation()
+
+                        barMoreDetails(dataFilterReducer(incomeArray), dataFilterReducer(expensesArray))
+                    }
+                }, {once: true})
             }else{
+                BAR_CHART_ELEMENT.style.paddingLeft = "15px"
                 BAR_CHART_ELEMENT.innerHTML = `
                 <span class="empty-bar">You don't track any expenses currently!</span>
                 `
+                BAR_CHART_ELEMENT.classList.remove("more-details")
             }
         }
         barChartSet()
@@ -142,6 +338,9 @@ const CORE_FUNCTION = (data, token) =>{
                 let FINAL_EXPENSE = ""
                 let RECURRING = false //initially
                 let FINAL_AMOUNT_VALUE = 0
+
+                document.body.style.overflow = "hidden"
+                ADDITIONAL_ELEMENT.classList.add("show")
 
                 //WHEN CALLING THIS FUNCTION IT OPENS THE CREATE CARD
                 ADDITIONAL_ELEMENT.innerHTML = `
@@ -352,7 +551,8 @@ const CORE_FUNCTION = (data, token) =>{
                             ADDITIONAL_ELEMENT.innerHTML =``
                         })
 
-                        donutsChartSet()
+                        barChartSet()
+                        setElementInitially()
                     }
                 })
 
@@ -466,7 +666,8 @@ const CORE_FUNCTION = (data, token) =>{
                             ADDITIONAL_ELEMENT.innerHTML =``
                         })
 
-                        donutsChartSet()
+                        barChartSet()
+                        setElementInitially()
                     }
                 })
 
@@ -524,7 +725,7 @@ const CORE_FUNCTION = (data, token) =>{
                             }, 1000);
                             //MUST REMEMBER COME AND CALL THE SET FUNCTIONS
                             expenseData = await getAllUserCreated()
-                            donutsChartSet()
+                            setElementInitially()
                             barChartSet()
                         }else{
                             createButton.classList.remove("invalid")
@@ -539,6 +740,9 @@ const CORE_FUNCTION = (data, token) =>{
                 let FINAL_INCOME = ""
                 let RECURRING = false //initially
                 let FINAL_AMOUNT_VALUE = 0
+
+                document.body.style.overflow = "hidden"
+                ADDITIONAL_ELEMENT.classList.add("show")
 
                 //WHEN CALLING THIS FUNCTION IT OPENS THE CREATE CARD
                 ADDITIONAL_ELEMENT.innerHTML = `
@@ -741,7 +945,9 @@ const CORE_FUNCTION = (data, token) =>{
 
                             ADDITIONAL_ELEMENT.innerHTML =``
                         })
-                        donutsChartSet()
+
+                        barChartSet()
+                        setElementInitially()
                     }
                 })
 
@@ -854,7 +1060,9 @@ const CORE_FUNCTION = (data, token) =>{
 
                             ADDITIONAL_ELEMENT.innerHTML =``
                         })
-                        donutsChartSet()
+
+                        barChartSet()
+                        setElementInitially()
                     }
                 })
 
@@ -912,7 +1120,7 @@ const CORE_FUNCTION = (data, token) =>{
                             }, 1000);
                             //MUST REMEMBER COME AND CALL THE SET FUNCTIONS
                             expenseData = await getAllUserCreated()
-                            donutsChartSet()
+                            setElementInitially()
                             barChartSet()
                         }else{
                             createButton.classList.remove("invalid")
@@ -923,6 +1131,10 @@ const CORE_FUNCTION = (data, token) =>{
             }  
             //USER CLICKS THE ELEMENT WITH DATA
             const createExpenseChart = (chartData) =>{
+                //console.log("expense chart")
+                document.body.style.overflow = "hidden"
+                ADDITIONAL_ELEMENT.classList.add("show")
+
                 ADDITIONAL_ELEMENT.innerHTML = `
                 <div class="parent">
                     <div class="chart-breakdown-wrapper">
@@ -1167,9 +1379,10 @@ const CORE_FUNCTION = (data, token) =>{
                             ADDITIONAL_ELEMENT.style.overflowY = "hidden"
                         })
 
-                        donutsChartSet()
+                        barChartSet()
+                        setElementInitially()
                     }
-                })
+                }, {once:true})
 
                 const closeButton = document.querySelector(".close")
                 closeButton.addEventListener("click", ()=>{
@@ -1187,16 +1400,22 @@ const CORE_FUNCTION = (data, token) =>{
 
                             ADDITIONAL_ELEMENT.innerHTML =``
                         })
-                        donutsChartSet()
+
+                        barChartSet()
+                        setElementInitially()
                     }
-                })
+                }, {once:true})
 
                 const createNewButton = document.querySelector(".add-new-expense")
                 createNewButton.addEventListener("click", ()=>{
                     creatingExpense()
-                })
+                }, {once:true})
             }          
             const createIncomeChart = (chartData) =>{
+                //console.log("income chart")
+                document.body.style.overflow = "hidden"
+                ADDITIONAL_ELEMENT.classList.add("show")
+
                 ADDITIONAL_ELEMENT.innerHTML = `
                 <div class="parent">
                     <div class="chart-breakdown-wrapper">
@@ -1442,9 +1661,10 @@ const CORE_FUNCTION = (data, token) =>{
                             ADDITIONAL_ELEMENT.style.overflowY = "hidden"
                         })
 
-                        donutsChartSet()
+                        barChartSet()
+                        setElementInitially()
                     }
-                })
+                }, {once:true})
 
                 const closeButton = document.querySelector(".close")
                 closeButton.addEventListener("click", ()=>{
@@ -1462,14 +1682,16 @@ const CORE_FUNCTION = (data, token) =>{
 
                             ADDITIONAL_ELEMENT.innerHTML =``
                         })
-                        donutsChartSet()
+
+                        barChartSet()
+                        setElementInitially()
                     }
-                })
+                }, {once:true})
 
                 const createNewButton = document.querySelector(".add-new-income")
                 createNewButton.addEventListener("click", ()=>{
                     creatingIncome()
-                })
+                }, {once:true})
             }
 
 
@@ -1504,158 +1726,228 @@ const CORE_FUNCTION = (data, token) =>{
 
             //if there is in fact data restructure
             //STARTING CHARTS
-            if(expenseData.data){
-                //SET THE DATA ARRAY USED FOR THE CHART
-                //CUSTOM DATA
-                const allUserData = expenseData.data
-                const todaysDate = new Date(Date.now())
-
-                const expensesArray = allUserData.filter((expense)=>{
+            const setElementInitially = () =>{
+                if(expenseData.data){
+                    //SET THE DATA ARRAY USED FOR THE CHART
+                    //CUSTOM DATA
+                    const allUserData = expenseData.data
+                    const todaysDate = new Date(Date.now())
+    
+                    const expensesArray = allUserData.filter((expense)=>{
+                        
+                        //filter data
+                        //if data is from this month keep it
+                        //if data is from a past month, but has recurring true keep it
+                        //anything else will be removed
+                        const dateOfCreation = new Date(expense.createdAt)
+                        const recurring = expense.recurring
+    
+                        if(expense.type === "expense"){
+                            if(dateOfCreation.getMonth() + 1 === todaysDate.getMonth() + 1 && dateOfCreation.getFullYear() === todaysDate.getFullYear()){
+                                return expense
+                            }else if(recurring === true){
+                                return expense
+                            }
+                        }
+                    })
+    
+                    const incomesArray = allUserData.filter((income)=>{
+                        const dateOfCreation = new Date(income.createdAt)
+                        const recurring = income.recurring
+    
+                        if(income.type === "income"){
+                            if(dateOfCreation.getMonth() + 1 === todaysDate.getMonth() + 1 && dateOfCreation.getFullYear() === todaysDate.getFullYear()){
+                                return income
+                            }else if(recurring === true){
+                                return income
+                            }
+                        }
+                    })
+                    //console.log(incomesArray, expensesArray)
+    
+                    const expenseChartSettings = {
+                        type: "doughnut",
+                        data: {
+                            datasets: [{
+                                //THE CUSTOM DATA
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: "40%",
+                            hover:{
+                                mode: null
+                            },
+                            plugins:{
+                                tooltip: {
+                                    enabled: false
+                                },
+                                legend: {
+                                    display: false,
+                                }
+                            },
+                            layout:{
+                                padding:{
+                                    left: 0,
+                                    right: 0,
+                                    top: 20,
+                                    bottom: 15
+                                }
+                            },
+                        },
+                        plugins: []
+                    }
+                    const incomeChartSettings = {
+                        type: "doughnut",
+                        data: {
+                            datasets: [{
+                                //THE CUSTOM DATA
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: "40%",
+                            hover:{
+                                mode: null
+                            },
+                            plugins:{
+                                tooltip: {
+                                    enabled: false
+                                },
+                                legend: {
+                                    display: false,
+                                }
+                            },
+                            layout:{
+                                padding:{
+                                    left: 0,
+                                    right: 0,
+                                    top: 20,
+                                    bottom: 15
+                                }
+                            },
+                        },
+                        plugins: []
+                    }
+    
+                    //IF WE HAVE DATA FOR A CHART CREATE ONE
+                    if(expensesArray.length){
+                        //reducing the data, if many duplicates 
+                        const arrayDataReduce = expensesArray.reduce((acc, curr) =>{
+                            if(acc[curr.typeofExpenseIncome]){
+                                acc[curr.typeofExpenseIncome] += curr.amount
+                            }else{
+                                acc[curr.typeofExpenseIncome] = curr.amount
+                            }
+    
+                            return acc
+                        }, {})
+                        const reducedDataObject = arrayDataReduce
+    
+                        const labels = Object.keys(reducedDataObject)
+                        const dataAmount = Object.values(reducedDataObject)
+    
+                        //console.log(labels, dataAmount)
+    
+                        //shallow copy of the settings
+                        expenseChartSettings.data.datasets = [{
+                            data: dataAmount,
+                            backgroundColor: getColorForLabel(labels)
+                        }]
+                        expenseChartSettings.data.labels = labels
+    
+                        EXPENSES_DONUT_ELEMENT.innerHTML = `
+                        <span class="expense absolute-chart-text">EXPENSES</span>
+                        <div class="chart-wrapper">
+                            <canvas aria-label="Donut chart displaying expenses you have this month" role="img"  id="expenseDonutChart"></canvas>
+                        </div>
+                        <span class="absolute-show-more">Show More</span>
+                        `
+    
+                        const expenseCanvas = document.querySelector("#expenseDonutChart").getContext("2d")
+                        //execution of the chart
+                        const expenseChart = new Chart(expenseCanvas, expenseChartSettings)
+    
+                        EXPENSES_DONUT_ELEMENT.addEventListener("click", (e)=>{
+                            e.stopPropagation()
+    
+                            createExpenseChart(expensesArray)
+                        }, {once:true})
+    
+                    }else{
+                        EXPENSES_DONUT_ELEMENT.innerHTML = `
+                        <span class="empty-donut">You don't have any expenses!</span>
+                        <div class="add-expense">
+                            <span>Add One</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
+                        </div>
+                        `
+                        EXPENSES_DONUT_ELEMENT.addEventListener("click", (e)=>{
+                            e.stopPropagation()
+        
+        
+                            creatingExpense()
+                        }, {once:true})
+                    }
+    
+                    if(incomesArray.length){
+                        const arrayDataReduce = incomesArray.reduce((acc, curr) =>{
+                            if(acc[curr.typeofExpenseIncome]){
+                                acc[curr.typeofExpenseIncome] += curr.amount
+                            }else{
+                                acc[curr.typeofExpenseIncome] = curr.amount
+                            }
+    
+                            return acc
+                        }, {})
+                        const reducedDataObject = arrayDataReduce
+    
+                        const labels = Object.keys(reducedDataObject)
+                        const dataAmount = Object.values(reducedDataObject)
+    
+                        //console.log(labels, dataAmount)
+    
+                        incomeChartSettings.data.datasets = [{
+                            data: dataAmount,
+                            backgroundColor: getColorForLabel(labels)
+                        }]
+                        incomeChartSettings.data.labels = labels
+                        
+                        INCOME_DONUT_ELEMENT.innerHTML = `
+                        <span class="income absolute-chart-text">INCOMES</span>
+                        <div class="chart-wrapper">
+                            <canvas aria-label="Donut chart displaying incomes you have this month" role="img"  id="incomeDonutChart"></canvas>
+                        </div>
+                        <span class="absolute-show-more">Show More</span>
+                        `
+                        const incomeCanvas = document.querySelector("#incomeDonutChart").getContext("2d")
+                        //execution of the chart
+                        const incomeChart = new Chart(incomeCanvas, incomeChartSettings)
+    
+                        INCOME_DONUT_ELEMENT.addEventListener("click", (e)=>{
+                            e.stopPropagation()
+    
+                            createIncomeChart(incomesArray)
+                        }, {once: true})
+    
+                    }else{
+                        INCOME_DONUT_ELEMENT.innerHTML = `
+                        <span class="empty-donut">You don't have any income!</span>
+                        <div class="add-income">
+                            <span>Add One</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
+                        </div>
+                        `
+                        INCOME_DONUT_ELEMENT.addEventListener("click", (e)=>{
+                            e.stopPropagation()
+    
+    
+                            creatingIncome()
+                        }, {once:true})
+                    }
                     
-                    //filter data
-                    //if data is from this month keep it
-                    //if data is from a past month, but has recurring true keep it
-                    //anything else will be removed
-                    const dateOfCreation = new Date(expense.createdAt)
-                    const recurring = expense.recurring
-
-                    if(expense.type === "expense"){
-                        if(dateOfCreation.getMonth() + 1 === todaysDate.getMonth() + 1 && dateOfCreation.getFullYear() === todaysDate.getFullYear()){
-                            return expense
-                        }else if(recurring === true){
-                            return expense
-                        }
-                    }
-                })
-
-                const incomesArray = allUserData.filter((income)=>{
-                    const dateOfCreation = new Date(income.createdAt)
-                    const recurring = income.recurring
-
-                    if(income.type === "income"){
-                        if(dateOfCreation.getMonth() + 1 === todaysDate.getMonth() + 1 && dateOfCreation.getFullYear() === todaysDate.getFullYear()){
-                            return income
-                        }else if(recurring === true){
-                            return income
-                        }
-                    }
-                })
-                //console.log(incomesArray, expensesArray)
-
-                const expenseChartSettings = {
-                    type: "doughnut",
-                    data: {
-                        datasets: [{
-                            //THE CUSTOM DATA
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        cutout: "40%",
-                        hover:{
-                            mode: null
-                        },
-                        plugins:{
-                            tooltip: {
-                                enabled: false
-                            },
-                            legend: {
-                                display: false,
-                            }
-                        },
-                        layout:{
-                            padding:{
-                                left: 0,
-                                right: 0,
-                                top: 20,
-                                bottom: 15
-                            }
-                        },
-                    },
-                    plugins: []
-                }
-                const incomeChartSettings = {
-                    type: "doughnut",
-                    data: {
-                        datasets: [{
-                            //THE CUSTOM DATA
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        cutout: "40%",
-                        hover:{
-                            mode: null
-                        },
-                        plugins:{
-                            tooltip: {
-                                enabled: false
-                            },
-                            legend: {
-                                display: false,
-                            }
-                        },
-                        layout:{
-                            padding:{
-                                left: 0,
-                                right: 0,
-                                top: 20,
-                                bottom: 15
-                            }
-                        },
-                    },
-                    plugins: []
-                }
-
-                //IF WE HAVE DATA FOR A CHART CREATE ONE
-                if(expensesArray.length){
-                    //reducing the data, if many duplicates 
-                    const arrayDataReduce = expensesArray.reduce((acc, curr) =>{
-                        if(acc[curr.typeofExpenseIncome]){
-                            acc[curr.typeofExpenseIncome] += curr.amount
-                        }else{
-                            acc[curr.typeofExpenseIncome] = curr.amount
-                        }
-
-                        return acc
-                    }, {})
-                    const reducedDataObject = arrayDataReduce
-
-                    const labels = Object.keys(reducedDataObject)
-                    const dataAmount = Object.values(reducedDataObject)
-
-                    //console.log(labels, dataAmount)
-
-                    //shallow copy of the settings
-                    expenseChartSettings.data.datasets = [{
-                        data: dataAmount,
-                        backgroundColor: getColorForLabel(labels)
-                    }]
-                    expenseChartSettings.data.labels = labels
-
-                    EXPENSES_DONUT_ELEMENT.innerHTML = `
-                    <span class="expense absolute-chart-text">EXPENSES</span>
-                    <div class="chart-wrapper">
-                        <canvas aria-label="Donut chart displaying expenses you have this month" role="img"  id="expenseDonutChart"></canvas>
-                    </div>
-                    <span class="absolute-show-more">Show More</span>
-                    `
-
-                    const expenseCanvas = document.querySelector("#expenseDonutChart").getContext("2d")
-                    //execution of the chart
-                    const expenseChart = new Chart(expenseCanvas, expenseChartSettings)
-
-                    EXPENSES_DONUT_ELEMENT.addEventListener("click", (e)=>{
-                        e.stopPropagation()
-
-                        document.body.style.overflow = "hidden"
-                        ADDITIONAL_ELEMENT.classList.add("show")
-
-                        createExpenseChart(expensesArray)
-                    }, {once:true})
-
                 }else{
                     EXPENSES_DONUT_ELEMENT.innerHTML = `
                     <span class="empty-donut">You don't have any expenses!</span>
@@ -1664,60 +1956,6 @@ const CORE_FUNCTION = (data, token) =>{
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
                     </div>
                     `
-                    EXPENSES_DONUT_ELEMENT.addEventListener("click", (e)=>{
-                        e.stopPropagation()
-    
-                        document.body.style.overflow = "hidden"
-                        ADDITIONAL_ELEMENT.classList.add("show")
-    
-                        creatingExpense()
-                    }, {once:true})
-                }
-
-                if(incomesArray.length){
-                    const arrayDataReduce = incomesArray.reduce((acc, curr) =>{
-                        if(acc[curr.typeofExpenseIncome]){
-                            acc[curr.typeofExpenseIncome] += curr.amount
-                        }else{
-                            acc[curr.typeofExpenseIncome] = curr.amount
-                        }
-
-                        return acc
-                    }, {})
-                    const reducedDataObject = arrayDataReduce
-
-                    const labels = Object.keys(reducedDataObject)
-                    const dataAmount = Object.values(reducedDataObject)
-
-                    //console.log(labels, dataAmount)
-
-                    incomeChartSettings.data.datasets = [{
-                        data: dataAmount,
-                        backgroundColor: getColorForLabel(labels)
-                    }]
-                    incomeChartSettings.data.labels = labels
-                    
-                    INCOME_DONUT_ELEMENT.innerHTML = `
-                    <span class="income absolute-chart-text">INCOMES</span>
-                    <div class="chart-wrapper">
-                        <canvas aria-label="Donut chart displaying incomes you have this month" role="img"  id="incomeDonutChart"></canvas>
-                    </div>
-                    <span class="absolute-show-more">Show More</span>
-                    `
-                    const incomeCanvas = document.querySelector("#incomeDonutChart").getContext("2d")
-                    //execution of the chart
-                    const incomeChart = new Chart(incomeCanvas, incomeChartSettings)
-
-                    INCOME_DONUT_ELEMENT.addEventListener("click", (e)=>{
-                        e.stopPropagation()
-
-                        document.body.style.overflow = "hidden"
-                        ADDITIONAL_ELEMENT.classList.add("show")
-
-                        createIncomeChart(incomesArray)
-                    }, {once: true})
-
-                }else{
                     INCOME_DONUT_ELEMENT.innerHTML = `
                     <span class="empty-donut">You don't have any income!</span>
                     <div class="add-income">
@@ -1725,51 +1963,24 @@ const CORE_FUNCTION = (data, token) =>{
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
                     </div>
                     `
+    
+                    EXPENSES_DONUT_ELEMENT.addEventListener("click", (e)=>{
+                        e.stopPropagation()
+        
+        
+                        creatingExpense()
+                        
+                    }, {once:true})
                     INCOME_DONUT_ELEMENT.addEventListener("click", (e)=>{
                         e.stopPropagation()
-
-                        document.body.style.overflow = "hidden"
-                        ADDITIONAL_ELEMENT.classList.add("show")
-
+        
+        
                         creatingIncome()
+                        
                     }, {once:true})
                 }
-                
-            }else{
-                EXPENSES_DONUT_ELEMENT.innerHTML = `
-                <span class="empty-donut">You don't have any expenses!</span>
-                <div class="add-expense">
-                    <span>Add One</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
-                </div>
-                `
-                INCOME_DONUT_ELEMENT.innerHTML = `
-                <span class="empty-donut">You don't have any income!</span>
-                <div class="add-income">
-                    <span>Add One</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
-                </div>
-                `
-
-                EXPENSES_DONUT_ELEMENT.addEventListener("click", ()=>{
-                    e.stopPropagation()
-    
-                    document.body.style.overflow = "hidden"
-                    ADDITIONAL_ELEMENT.classList.add("show")
-    
-                    creatingExpense()
-                    
-                }, {once:true})
-                INCOME_DONUT_ELEMENT.addEventListener("click", (e)=>{
-                    e.stopPropagation()
-    
-                    document.body.style.overflow = "hidden"
-                    ADDITIONAL_ELEMENT.classList.add("show")
-    
-                    creatingIncome()
-                    
-                }, {once:true})
             }
+            setElementInitially()
         }
         donutsChartSet()
     }

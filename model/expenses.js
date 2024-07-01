@@ -142,13 +142,15 @@ ExpensesSchema.pre("findOneAndUpdate", async function(next){
     }
 
     //see what changes are made
+    /*
     const changes = {}
     Object.keys(update).forEach(key =>{
         if(this.schema.paths[key]){
             if(!_.isEqual(originalDoc[key], update[key])){
                 changes[key] = {
                     old: originalDoc[key],
-                    new: update[key]
+                    new: update[key],
+                    date: Date.now()
                 }
             }
         }
@@ -156,9 +158,9 @@ ExpensesSchema.pre("findOneAndUpdate", async function(next){
 
     //update the history property
     docToUpdate.history.changes = []
-    docToUpdate.history.changes.push(changes)
+    docToUpdate.history.changes.push(changes) */
 
-    await docToUpdate.save()
+    //await docToUpdate.save()
 
     next()
 })
