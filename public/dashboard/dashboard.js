@@ -118,110 +118,68 @@ const CORE_FUNCTION = (data, token) =>{
         const BAR_CHART_ELEMENT = document.querySelector(".bar-chart-element")
         const EXPENSES_DONUT_ELEMENT = document.querySelector(".expense-donut")
         const INCOME_DONUT_ELEMENT = document.querySelector(".income-donut")
+
+        const EXPENSES_WRAPPER = document.querySelector(".expenses-wrapper")
+        const INCOME_WRAPPER = document.querySelector(".income-wrapper")
         
         const ADDITIONAL_ELEMENT = document.querySelector(".additional-element")
 
+        //FULLY DONE
         const barChartSet = () =>{
 
             //more details about the chart
             const barMoreDetails = (incomeData, expenseData) =>{
-                console.log(incomeData, expenseData)
-            }
+                //reduce to only 2 months
+                //this and previous
+                const incomeThisMonth = incomeData.slice(-2).reverse()
+                const expensesThisMonth = expenseData.slice(-2).reverse()
 
-            //custom func to determine step size
-            const stepSize = (min, max) =>{
-                return (max - min) / 10 
-            }
+                document.body.style.overflow = "hidden"
+                ADDITIONAL_ELEMENT.classList.add("show")
+                ADDITIONAL_ELEMENT.innerHTML = `
+                <div class="parent">
+                    <div class="monthly-expenses-breakdown">
+                        <span class="chart-title">Montly Expenses/Income</span>
 
-            if(expenseData.data){
-                BAR_CHART_ELEMENT.style.paddingLeft = 0
-                BAR_CHART_ELEMENT.classList.add("more-details")
+                        <div class="bigger-bar-chart-wrapper">
+                            <canvas id="barChartCanvas" role="image" aria-label="Bar chart displaying your monthly expenses/income"></canvas>
+                        </div>
 
-                BAR_CHART_ELEMENT.innerHTML = `
-                <canvas id="bar-chart"></canvas>
+                        <span class="total-text">Your total <span class="big-ex">EXPENSES</span> this month are: <span class="big-ex">${Number(expensesThisMonth[0].total_amount).toLocaleString("en-US", {
+                            style: "currency",
+                            currency: "USD",
+                            maximumFractionDigits: 2,
+                            minimumFractionDigits: 2
+                        })}</span></span>
+
+                        <span class="total-text">Your total <span class="big-in">INCOME</span> this month is: <span class="big-in">${Number(incomeThisMonth[0].total_amount).toLocaleString("en-US", {
+                            style: "currency",
+                            currency: "USD",
+                            maximumFractionDigits: 2,
+                            minimumFractionDigits: 2
+                        })}</span></span>
+
+                        <span class="total-balance-text">TOTAL BALANCE: <span class="total-balance">${Number(incomeThisMonth[0].total_amount - expensesThisMonth[0].total_amount).toLocaleString("en-US", {
+                            style: "currency",
+                            currency: "USD",
+                            maximumFractionDigits: 2,
+                            minimumFractionDigits: 2
+                        })}</span></span>
+
+                        <div class="close-bar">Close</div>
+                    </div>
+                </div>
                 `
-                
-                const expensesArray = expenseData.data.filter(data =>{
-                    return data.type === "expense"
-                })
-                const incomeArray = expenseData.data.filter(data =>{
-                    return data.type === "income"
-                })
+                //console.log(expensesThisMonth)
 
-                const dataFilterReducer = (data) =>{
-                    const processedData = [] //we will store it here
-
-                    //compare the 2 dates
-                    const currentDate = new Date()
-                    const currentMonth = currentDate.getMonth()
-                    const currentYear = currentDate.getFullYear()
-
-                    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-
-                    //filtering
-                    data.forEach(item => {
-                        const creationDate = new Date(item.createdAt)
-                        const creationMonth = creationDate.getMonth()
-                        const creationYear = creationDate.getFullYear()
-
-                        let year = creationYear
-                        let month = creationMonth
-                        
-                        while (year < currentYear || (year === currentYear && month <= currentMonth)){
-                            processedData.push({
-                                amount: item.amount,
-                                date: `${months[month]}, ${year}`
-                            })
-
-                            if(!item.recurring){
-                                break
-                            }
-
-                            month++
-                            if(month > 11){
-                                month = 0
-                                year++
-                            }
-                        }
-                    })
-
-                    //get the total for each month
-                    const monthly_total = processedData.reduce((acc, item) =>{
-                        const key = `${item.date}`
-                        if(!acc[key]){
-                            acc[key] = { date: item.date, total_amount: 0 }
-                        }
-
-                        acc[key].total_amount += item.amount
-                        return acc
-                    }, {})
-
-                    const result = Object.values(monthly_total)
-                    return result
-                }
-                
-                //data and labels
-                const chartDataExpenses = dataFilterReducer(expensesArray).map(doc =>{
+                const chartDataExpenses = expenseData.map(doc =>{
                     return doc.total_amount
                 })
-                const chartDataIncomes = dataFilterReducer(incomeArray).map(doc =>{
+                const chartDataIncomes = incomeData.map(doc =>{
                     return doc.total_amount
                 })
+                const labels = () => expenseData.map(doc=> doc.date)
 
-
-                const labels = () =>{
-                    if(dataFilterReducer(expensesArray).length > dataFilterReducer(incomeArray).length){
-                        return dataFilterReducer(expensesArray).map(doc=>{
-                            return doc.date
-                        })
-                    }else{
-                        return dataFilterReducer(incomeArray).map(doc=>{
-                            return doc.date
-                        })
-                    }
-                }
-                //console.log(labels())
-                
                 const chartSettings = {
                     type: "bar",
                     data: {
@@ -245,11 +203,12 @@ const CORE_FUNCTION = (data, token) =>{
                         hover:{
                             mode: null
                         },
+                        aspectRatio: 3/2,
                         responsive: true,
                         maintainAspectRatio: false,
                         scales: {
                             y: {
-                                max: Math.round(((Math.max(...[...chartDataExpenses, ...chartDataIncomes])) * 1.5) / 1000) * 1000,
+                                max: Math.ceil(((Math.max(...[...chartDataExpenses, ...chartDataIncomes])) * 1.5) / 1000) * 1000,
                                 beginAtZero: true,
                                 ticks: {
                                     callback: function(v, i, vs){
@@ -306,7 +265,285 @@ const CORE_FUNCTION = (data, token) =>{
                 }
 
                 chartSettings.options.scales.y.ticks.stepSize = stepSize(0, chartSettings.options.scales.y.max)
-                //console.log(stepSize(0, chartSettings.options.scales.y.max))
+
+                const chartCanvas = document.querySelector("#barChartCanvas").getContext("2d")
+                const barChart = new Chart(chartCanvas, chartSettings)
+
+
+                const totalBalance = document.querySelector(".total-balance")
+                
+                const dirtyAmount = totalBalance.textContent.replace(/[^0-9.-]/g, "")
+                const numberAmount = parseFloat(dirtyAmount)
+
+                if(numberAmount > 0){
+                    totalBalance.classList.add("positive")
+                }else if(numberAmount < 0){
+                    totalBalance.classList.add("negative")
+                }else{
+                    totalBalance.classList.add("neutral")
+                }
+
+                const parent = document.querySelector(".parent")
+                parent.classList.add("show")
+
+                if(parent.clientHeight >= window.innerHeight - 40){
+                    ADDITIONAL_ELEMENT.style.alignItems = "baseline"
+                    ADDITIONAL_ELEMENT.style.overflowY = "auto"
+                }else{
+                    ADDITIONAL_ELEMENT.style.alignItems = "center"
+                }
+
+                parent.addEventListener("click", (e)=>{
+                    e.stopPropagation()
+                })
+
+                //WINDOW EVENT CLOSING EVERYHTING
+                window.addEventListener("click", ()=>{
+                    if(parent.classList.contains("show")){
+                        parent.classList.remove("show")
+                        parent.classList.add("hide")
+    
+                        ADDITIONAL_ELEMENT.classList.remove("show")
+                        ADDITIONAL_ELEMENT.classList.add("hide")
+    
+                        parent.addEventListener("animationend", ()=>{
+                            parent.classList.remove("hide")
+                            ADDITIONAL_ELEMENT.classList.remove("hide")
+                            document.body.style.overflow = "auto"
+
+                            ADDITIONAL_ELEMENT.innerHTML =``
+                        })
+
+                        barChartSet()
+                        donutsChartSet()
+                    }
+                })
+
+                const closeButton = document.querySelector(".close-bar")
+                closeButton.addEventListener("click", ()=>{
+                    if(parent.classList.contains("show")){
+                        parent.classList.remove("show")
+                        parent.classList.add("hide")
+    
+                        ADDITIONAL_ELEMENT.classList.remove("show")
+                        ADDITIONAL_ELEMENT.classList.add("hide")
+    
+                        parent.addEventListener("animationend", ()=>{
+                            parent.classList.remove("hide")
+                            ADDITIONAL_ELEMENT.classList.remove("hide")
+                            document.body.style.overflow = "auto"
+
+                            ADDITIONAL_ELEMENT.innerHTML =``
+                        })
+
+                        barChartSet()
+                        donutsChartSet()
+                    }
+                }, {once:true})
+            }
+
+            //custom func to determine step size
+            const stepSize = (min, max) =>{
+                return (max - min) / 10 
+            }
+
+            if(expenseData.data){
+                BAR_CHART_ELEMENT.style.paddingLeft = 0
+                BAR_CHART_ELEMENT.classList.add("more-details")
+
+                BAR_CHART_ELEMENT.innerHTML = `
+                <canvas aria-label="Bar chart displaying your monthly expenses/income" role="image" id="bar-chart"></canvas>
+                `
+                
+                //initial expenses and incomes
+                const expensesArray = expenseData.data.filter(data =>{
+                    return data.type === "expense"
+                })
+                const incomeArray = expenseData.data.filter(data =>{
+                    return data.type === "income"
+                })
+
+                //reducer and filter
+                const dataFilterReducer = (data) =>{
+                    //console.log(data)
+
+                    //compare the dates
+                    const currentDate = new Date()
+                    const currentMonth = currentDate.getMonth()
+                    const currentYear = currentDate.getFullYear()
+
+                    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+
+                    if(data.length === 0){
+                        return [{ date: `${months[currentMonth]}, ${currentYear}`, total_amount: 0 }]
+                    }
+
+                    const startingDate = new Date(data[0].createdAt)
+                    const startMonth = startingDate.getMonth()
+                    const startYear = startingDate.getFullYear()
+
+                    const monthly_total = {}
+
+                    //if there is a month with no data fill it with 0
+                    const fillMissingMonth = (startMonth, startYear, endMonth, endYear) =>{
+                        let year = startYear
+                        let month = startMonth
+
+                        while(year < endYear || (year === endYear && month <= endMonth)){
+
+                            const key = `${months[month]}, ${year}`
+
+                            if(!monthly_total[key]){
+                                monthly_total[key] = { date:key, total_amount:0 }
+                            }
+
+                            month++
+                            if(month > 11){
+                                month = 0
+                                year++
+                            }
+                        }
+                    }
+
+                    fillMissingMonth(startMonth, startYear, currentMonth, currentYear)
+
+                    //filtering
+                    data.forEach(item => {
+                        const creationDate = new Date(item.createdAt)
+                        const creationMonth = creationDate.getMonth()
+                        const creationYear = creationDate.getFullYear()
+
+                        let year = creationYear
+                        let month = creationMonth
+                        
+                        while (year < currentYear || (year === currentYear && month <= currentMonth)){
+                            const key = `${months[month]}, ${year}`
+
+                            if (!monthly_total[key]) {
+                                monthly_total[key] = { date:key, total_amount:0 }
+                            }
+
+                            monthly_total[key].total_amount += item.amount
+
+                            if(!item.recurring){
+                                break
+                            }
+
+                            month++
+                            if(month > 11){
+                                month = 0
+                                year++
+                            }
+                        }
+                    })
+
+                    const result = Object.values(monthly_total)
+            
+                    //finally return the last 6 months
+                    return result.slice(-6)
+                }
+                //console.log(dataFilterReducer(expensesArray), dataFilterReducer(incomeArray))
+                
+                const reducedExpenses = dataFilterReducer(expensesArray)
+                const reducedIncomes = dataFilterReducer(incomeArray)
+
+                //chart data and labels
+                const chartDataExpenses = reducedExpenses.map(doc =>{
+                    return doc.total_amount
+                })
+                const chartDataIncomes = reducedIncomes.map(doc =>{
+                    return doc.total_amount
+                })
+                //console.log(chartDataExpenses, chartDataIncomes)
+
+                const labels = () => reducedExpenses.map(doc=> doc.date)
+                //console.log(labels())
+                
+                const chartSettings = {
+                    type: "bar",
+                    data: {
+                        labels: labels(),
+                        datasets: [
+                            {
+                                data: chartDataExpenses,
+                                backgroundColor: "#e80e1d",
+                                categoryPercentage: 0.6,
+                                barPercentage: 0.7,    
+                            },
+                            { 
+                                data: chartDataIncomes,
+                                backgroundColor: "#0ee82f",
+                                categoryPercentage: 0.6,
+                                barPercentage: 0.7,
+                            }
+                        ]
+                    },
+                    options: {
+                        hover:{
+                            mode: null
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                max: Math.ceil(((Math.max(...[...chartDataExpenses, ...chartDataIncomes])) * 1.5) / 1000) * 1000,
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(v, i, vs){
+                                        return Number(v).toLocaleString("en-US", {
+                                            style: "currency",
+                                            currency: "USD",
+                                            maximumFractionDigits: 0
+                                        })
+                                    },
+                                    font: {
+                                        family: "Poppins",
+                                        size: 12,
+                                        lineHeight: 1,
+                                    },
+                                    color: "#555555",
+                                    padding: 10,
+                                },
+                                grid: {
+                                    drawTicks: false,
+                                    color: "#D8D8D8",
+                                },
+                                border: {
+                                    color: "#D8D8D8"
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    drawTicks: false,
+                                    color: "#D8D8D8",                                },
+                                ticks: {
+                                    padding: 10,
+                                    font: {
+                                        family: "Poppins",
+                                        size: 12,
+                                        lineHeight: 1,
+                                    },
+                                    color: "#555555"
+                                },
+                                border: {
+                                    color: "#D8D8D8"
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: false
+                            },
+                            tooltip: {
+                                enabled: false
+                            }
+                        }
+                    },
+                    plugins: [] 
+                }
+
+                chartSettings.options.scales.y.ticks.stepSize = stepSize(0, chartSettings.options.scales.y.max)
+                //console.log(chartSettings.options.scales.y.max)
 
                 const chartCanvas = document.querySelector("#bar-chart").getContext("2d") 
                 const barChart = new Chart(chartCanvas, chartSettings)
@@ -316,7 +553,7 @@ const CORE_FUNCTION = (data, token) =>{
                     if(BAR_CHART_ELEMENT.classList.contains("more-details")){
                         e.stopPropagation()
 
-                        barMoreDetails(dataFilterReducer(incomeArray), dataFilterReducer(expensesArray))
+                        barMoreDetails(reducedIncomes, reducedExpenses)
                     }
                 }, {once: true})
             }else{
@@ -1916,7 +2153,7 @@ const CORE_FUNCTION = (data, token) =>{
                         incomeChartSettings.data.labels = labels
                         
                         INCOME_DONUT_ELEMENT.innerHTML = `
-                        <span class="income absolute-chart-text">INCOMES</span>
+                        <span class="income absolute-chart-text">INCOME</span>
                         <div class="chart-wrapper">
                             <canvas aria-label="Donut chart displaying incomes you have this month" role="img"  id="incomeDonutChart"></canvas>
                         </div>
@@ -1983,6 +2220,25 @@ const CORE_FUNCTION = (data, token) =>{
             setElementInitially()
         }
         donutsChartSet()
+
+        //LAST SEGMENT
+        const expensesIncomeList = () =>{
+
+            if(expenseData.data){
+
+            }else{
+                EXPENSES_WRAPPER.innerHTML = `
+                <span class="no-data">You don't track any expenses currently!</span>
+                `
+                INCOME_WRAPPER.innerHTML = `
+                <span class="no-data">You don't track any income currently!</span>
+                ` 
+
+                EXPENSES_WRAPPER.classList.remove("show-expenses")
+                INCOME_WRAPPER.classList.remove("show-expenses")
+            }
+        }
+        expensesIncomeList()
     }
     SET_ELEMENTS()
 
@@ -1999,7 +2255,19 @@ const CORE_FUNCTION = (data, token) =>{
                     </div>
                 </div>
 
-                <div class="expense-income-wrapper"></div>
+                <div class="expense-income-wrapper">
+                    <div class="this-month-expenses">
+                        <span class="expense-title">EXPENSES</span>
+                        
+                        <div class="expenses-wrapper"></div>
+                    </div>
+
+                    <div class="this-month-income">
+                        <span class="income-title">INCOME</span>
+                        
+                        <div class="income-wrapper"></div>
+                    </div>
+                </div>
             </div>
         </div>
 

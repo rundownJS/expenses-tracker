@@ -68,10 +68,11 @@ body{
     display: flex;
     flex-grow: 1;
     margin-top: 30px;
+    justify-content: space-between;
 }
 
 .bar-donut-wrapper{
-    width: 50%;
+    width: 49%;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -90,6 +91,7 @@ body{
     align-items: center;
     justify-content: center;
     padding: 0 15px;
+    padding-left: 0;
     transition: 150ms linear;
 }
 
@@ -459,7 +461,7 @@ input#income-amount::-webkit-inner-spin-button, input#income-amount::-webkit-out
     justify-content: space-around;
 }
 
-.cancel, .create, .close{
+.cancel, .create, .close, .close-bar{
     border-radius: 6px;
     display: flex;
     align-items: center;
@@ -472,10 +474,10 @@ input#income-amount::-webkit-inner-spin-button, input#income-amount::-webkit-out
     font-size: 1.1rem;
     user-select: none;
 }
-.cancel, .close{
+.cancel, .close, .close-bar{
     background-color: #D8D8D8;
 }
-.cancel:hover, .close:hover{
+.cancel:hover, .close:hover, .close-bar:hover{
     background-color: #c6c6c6;
 }
 .create{
@@ -672,3 +674,117 @@ input#income-amount::-webkit-inner-spin-button, input#income-amount::-webkit-out
     cursor: pointer;
 }
 
+.monthly-expenses-breakdown{
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 0;
+    padding-right: 2rem;
+    width: 500px;
+}
+.chart-title{
+    font-size: 1.5rem;
+    color: #050505;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 500;
+    margin-left: 2rem;
+}
+
+.bigger-bar-chart-wrapper{
+    margin-bottom: 20px;
+    margin-left: 12px;
+}
+
+.total-text{
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #050505;
+    margin-bottom: 10px;
+    margin-left: 2rem;
+}
+
+.total-text .big-ex{
+    color: rgb(255, 0, 0)
+}
+.total-text .big-in{
+    color: rgb(0, 175, 0);
+}
+
+.total-balance-text{
+    font-size: 1.3rem;
+    font-weight: 500;
+    margin-top: 10px;
+    margin-bottom: 30px;
+    margin-left: 2rem;
+}
+.total-balance.positive{
+    color: rgb(0, 175, 0);
+}
+.total-balance.negative{
+    color: rgb(255, 0, 0);
+}
+.total-balance.neutral{
+    color: #a3a0a0;
+}
+
+.close-bar{
+    align-self: center;
+    margin-left: 2rem;
+}
+#barChartCanvas{
+    width: 100%;
+}
+
+
+
+
+/* LAST SEGMENT */
+.expense-income-wrapper{
+    width: 49%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.this-month-expenses, .this-month-income{
+    width: 48%;
+    height: 100%;
+    border-radius: 8px;
+    transition: 150ms linear;
+    padding: 15px 0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.expense-title, .income-title{
+    font-size: 1.5rem;
+    font-weight: 500;
+    text-align: center;
+    width: 80%;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #D8D8D8;
+}
+.expense-title{
+    color: rgb(255, 0, 0);
+}
+.income-title{
+    color: rgb(0, 175, 0);
+}
+
+.expenses-wrapper, .income-wrapper{
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+.no-data{
+    font-size: 1.3rem;
+    color: #050505;
+    font-weight: 500;
+    text-align: center;
+    width: 80%;
+}
