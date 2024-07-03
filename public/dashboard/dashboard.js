@@ -598,7 +598,7 @@ const CORE_FUNCTION = (data, token) =>{
                                 <span data-category="transportation" class="pick">Transportation</span>
                                 <span data-category="food" class="pick">Food</span>
                                 <span data-category="utilities" class="pick">Utilities</span>
-                                <span data-category="health_wellness" class="pick">Health Wellness</span>
+                                <span data-category="health_wellness" class="pick">Health & Wellness</span>
                                 <span data-category="debt" class="pick">Debt</span>
                                 <span data-category="entertainment" class="pick">Entertainment</span>
                                 <span data-category="clothing" class="pick">Clothing</span>
@@ -1503,7 +1503,7 @@ const CORE_FUNCTION = (data, token) =>{
                     const strSplit = str.split("_")
 
                     if(strSplit.length > 1){
-                        if(strSplit[0] === "health"){
+                        if(strSplit[0] === "health" || strSplit[0] === "gifts"){
                             return strSplit.map(word =>{
                                 return word.charAt(0).toUpperCase() + word.slice(1)
                             }).join(" & ")
@@ -1784,7 +1784,7 @@ const CORE_FUNCTION = (data, token) =>{
                     const strSplit = str.split("_")
 
                     if(strSplit.length > 1){
-                        if(strSplit[0] === "health"){
+                        if(strSplit[0] === "health" || strSplit[0] === "gifts"){
                             return strSplit.map(word =>{
                                 return word.charAt(0).toUpperCase() + word.slice(1)
                             }).join(" & ")
@@ -2225,6 +2225,179 @@ const CORE_FUNCTION = (data, token) =>{
         const expensesIncomeList = () =>{
 
             if(expenseData.data){
+                //format strings
+                const formatCategory = (str) =>{
+                    const strSplit = str.split("_")
+
+                    if(strSplit.length > 1){
+                        if(strSplit[0] === "health" || strSplit[0] === "gifts"){
+                            return strSplit.map(word =>{
+                                return word.charAt(0).toUpperCase() + word.slice(1)
+                            }).join(" & ")
+                        }else{
+                            return strSplit.map(word =>{
+                                return word.charAt(0).toUpperCase() + word.slice(1)
+                            }).join(" ")
+                        }
+                    }else{
+                        return strSplit[0].charAt(0).toUpperCase() + strSplit[0].slice(1)
+                    }
+                }
+                const formatExpense = (str) =>{
+                    const words = str.split(/(\s+|\(|\)|\/|,)/)
+
+                    //const wordCount = words.filter(word => /\w/.test(word)).length
+
+                    for(let i = 0; i < words.length; i++){
+                        if (/\w/.test(words[i])){
+                            words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1)
+                        }
+                    }
+                    
+                    return words.join("")
+                }
+
+                //loop to create elements
+                const showSomeData = (dataArray) =>{
+                    let total_amount = 0
+                    const elementWrapper = document.createElement("div")
+                    elementWrapper.classList.add("expense-income-data-wrapper")
+
+                    for(let i = 0; i < dataArray.length; i++){
+                        const dataElement = document.createElement("div")
+                        dataElement.classList.add("expense-income-data")
+
+                        total_amount += dataArray[i].amount
+
+                        dataElement.innerHTML = `
+                        <div class="data-category">
+                            <span>${formatCategory(dataArray[i].typeofExpenseIncome)}</span>
+                            ,<span> ${formatExpense(dataArray[i].subtypeofExpenseIncome)}</span>
+                        </div>
+
+                        <div class="data-amount">
+                            <span>${Number(dataArray[i].amount).toLocaleString("en-US", {
+                                style: "currency",
+                                currency: "USD",
+                                maximumFractionDigits: 2,
+                                minimumFractionDigits: 2
+                            })}</span>
+                            ,<span> ${dataArray[i].recurring === true ? "Recurring" : "One-time" }</span>
+                        </div>
+                        `
+                        elementWrapper.appendChild(dataElement)
+                    }
+
+                    const totalElement = document.createElement("div")
+                    totalElement.classList.add("expense-income-data-total")
+
+                    if(total_amount > 1000000){
+                        total_amount = "$" + (total_amount / 1000000).toFixed(0) + "M+"
+                    }else{
+                        total_amount = Number(total_amount).toLocaleString("en-US", {
+                            currency: "USD",
+                            style: "currency",
+                            maximumFractionDigits: 2,
+                            minimumFractionDigits: 2
+                        })
+                    }
+
+                    totalElement.innerHTML = `<span>TOTAL: <span class="data-total">${total_amount}</span></span>`
+
+                    if(dataArray[0].type === "expense"){
+                        EXPENSES_WRAPPER.appendChild(elementWrapper)
+                        EXPENSES_WRAPPER.appendChild(totalElement)
+                        totalElement.classList.add("red")
+
+                        if(dataArray.length > 6){
+                            elementWrapper.classList.add("overflows")
+                        }
+                    }else{
+                        INCOME_WRAPPER.appendChild(elementWrapper)
+                        INCOME_WRAPPER.appendChild(totalElement)
+                        totalElement.classList.add("green")
+
+                        if(dataArray.length > 6){
+                            elementWrapper.classList.add("overflows")
+                        }
+                    }
+
+                    const allDataCategory = document.querySelectorAll(".data-category")
+                    const allDataAmount = document.querySelectorAll(".data-amount")
+                    for(let i = 0; i < allDataCategory.length; i++){
+                        allDataCategory[i].style.width = `${elementWrapper.clientWidth - 42}px`
+                        allDataAmount[i].style.width = `${elementWrapper.clientWidth - 42}px`
+                    }
+                    window.addEventListener("resize", ()=>{
+                        if(allDataCategory.length){
+                            for(let i = 0; i < allDataCategory.length; i++){
+                                allDataCategory[i].style.width = `${elementWrapper.clientWidth - 42}px`
+                                allDataAmount[i].style.width = `${elementWrapper.clientWidth - 42}px`
+                                //console.log(elementWrapper.clientWidth - 42)
+                            }
+                        }
+                    })
+                }
+
+                //filter the data like the donut chart
+                //only show this month expense/income or recurring
+                const allUserData = expenseData.data
+                const todaysDate = new Date(Date.now())
+
+                const expensesArray = allUserData.filter((expense)=>{
+                    
+                    const dateOfCreation = new Date(expense.createdAt)
+                    const recurring = expense.recurring
+
+                    if(expense.type === "expense"){
+                        if(dateOfCreation.getMonth() + 1 === todaysDate.getMonth() + 1 && dateOfCreation.getFullYear() === todaysDate.getFullYear()){
+                            return expense
+                        }else if(recurring === true){
+                            return expense
+                        }
+                    }
+                })
+
+                const incomesArray = allUserData.filter((income)=>{
+                    const dateOfCreation = new Date(income.createdAt)
+                    const recurring = income.recurring
+
+                    if(income.type === "income"){
+                        if(dateOfCreation.getMonth() + 1 === todaysDate.getMonth() + 1 && dateOfCreation.getFullYear() === todaysDate.getFullYear()){
+                            return income
+                        }else if(recurring === true){
+                            return income
+                        }
+                    }
+                })
+
+                if(expensesArray.length){
+                    const sortedByAmountEXPENSES = expensesArray.toSorted((a, b) => b.amount - a.amount)
+
+                    showSomeData(sortedByAmountEXPENSES)
+                    EXPENSES_WRAPPER.classList.add("show-expenses")
+                    EXPENSES_WRAPPER.style.justifyContent = "space-between"
+                }else{
+                    EXPENSES_WRAPPER.classList.remove("show-expenses")
+                    EXPENSES_WRAPPER.innerHTML = `
+                    <span class="no-data">You don't track any expenses currently!</span>
+                    `
+                    EXPENSES_WRAPPER.style.justifyContent = "center"
+                }
+
+                if(incomesArray.length){
+                    const sortedByAmountINCOME = incomesArray.toSorted((a, b) => b.amount - a.amount)
+
+                    showSomeData(sortedByAmountINCOME)
+                    INCOME_WRAPPER.classList.add("show-expenses")
+                    INCOME_WRAPPER.style.justifyContent = "space-between"
+                }else{
+                    INCOME_WRAPPER.classList.remove("show-expenses")
+                    EXPENSES_WRAPPER.innerHTML = `
+                    <span class="no-data">You don't track any income currently!</span>
+                    `
+                    INCOME_WRAPPER.style.justifyContent = "center"
+                }
 
             }else{
                 EXPENSES_WRAPPER.innerHTML = `
@@ -2233,6 +2406,9 @@ const CORE_FUNCTION = (data, token) =>{
                 INCOME_WRAPPER.innerHTML = `
                 <span class="no-data">You don't track any income currently!</span>
                 ` 
+
+                EXPENSES_WRAPPER.style.justifyContent = "center"
+                INCOME_WRAPPER.style.justifyContent = "center"
 
                 EXPENSES_WRAPPER.classList.remove("show-expenses")
                 INCOME_WRAPPER.classList.remove("show-expenses")
