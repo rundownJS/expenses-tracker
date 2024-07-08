@@ -669,7 +669,7 @@ input#income-amount::-webkit-inner-spin-button, input#income-amount::-webkit-out
 }
 
 
-.bar-chart-element.more-details:hover{
+.bar-chart-element.more-details:hover, .this-month-expenses.show-expenses:hover, .this-month-income.show-expenses:hover{
     box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.3);
     cursor: pointer;
 }
@@ -801,6 +801,7 @@ input#income-amount::-webkit-inner-spin-button, input#income-amount::-webkit-out
     width: 100%;
     color: #050505;
     max-height: 484px;
+    transition: 150ms linear;
 }
 .expense-income-data{
     padding: 10px 20px;
@@ -836,4 +837,164 @@ input#income-amount::-webkit-inner-spin-button, input#income-amount::-webkit-out
 }
 .expense-income-data-total.green .data-total{
     color: rgb(0, 175, 0);
+}
+
+.expense-income-data-wrapper.overflows{
+    box-shadow: inset 0 -20px 20px -20px rgba(0, 0, 0, 0.4);
+}
+
+.this-month-expenses.show-expenses:hover .expense-income-data-wrapper.overflows{
+    box-shadow: inset 0 -25px 20px -20px rgba(0, 0, 0, 0.5);
+}
+
+.detailed-data{
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 2rem;
+    width: 600px;
+}
+
+.overview-title{
+    font-size: 1.5rem;
+    color: #050505;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+
+.detailed-income-expense{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.action-buttons{
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+.action-buttons .delete svg, .action-buttons .edit svg{
+    width: 18px;
+    height: 18px;
+    fill: #000;
+}
+.action-buttons .edit{
+    background-color: #ea900b;
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 150ms linear;
+    cursor: pointer;
+    user-select: none;
+}
+.action-buttons .delete{
+    background-color: rgb(255, 0, 0);
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 150ms linear;
+    cursor: pointer;
+    user-select: none;
+}
+
+.action-buttons .delete:hover{
+    background-color: rgb(232, 0, 0);
+}
+.action-buttons .edit:hover{
+    background-color: rgb(212, 131, 8);
+}
+
+.details{
+    display: flex;
+    flex-direction: column;
+    gap: 5px
+}
+.detailed-wrapper{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+
+.deleting-choice{
+    position: fixed;
+    top: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    overflow: hidden;
+}
+
+.deleting-choice > div{
+    background-color: #fff;
+    border-radius: 8px;
+    margin: 20px 0;
+    padding: 1.5rem 2rem;
+    border: 4px solid rgb(255, 0, 0);
+    max-width: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.deleting-choice span{
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #050505;
+    text-align: center;
+    margin-bottom: 30px;
+    line-height: 1.3;
+}
+
+.deleting-choice > div > div{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+}
+
+.deleting-choice .cancel-del, .deleting-choice .delete-btn{
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 150ms linear;
+    height: 40px;
+    width: 87px;
+    font-size: 1rem;
+    user-select: none;
+}
+.deleting-choice .cancel-del{
+    background-color: #D8D8D8;
+}
+.deleting-choice .delete-btn{
+    color: #fff;
+    background-color: rgb(255, 0, 0);
+}
+
+.deleting-choice .cancel-del:hover{
+    background-color: #c6c6c6;
+}
+.deleting-choice .delete-btn:not(.pending):hover{
+    background-color: rgb(232, 0, 0);
+}
+
+.delete-btn.pending{
+    cursor: not-allowed;
+    opacity: 0.7;
 }

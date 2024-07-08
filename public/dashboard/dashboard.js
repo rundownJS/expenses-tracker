@@ -88,6 +88,7 @@ const CORE_FUNCTION = (data, token) =>{
         }
     }
 
+    //creating new data
     const createNewExpenseIncome = async (reqBody) =>{
         try {
             const postRequest = await fetch(`/expenses-tracker/api/v1/expenses/create-expense-income`, {
@@ -108,6 +109,26 @@ const CORE_FUNCTION = (data, token) =>{
         }
     }
 
+    //delete data with ID
+    const deleteExpenseIncome = async (documentID) => {
+        try{
+            const request = await fetch(`/expenses-tracker/api/v1/expenses/delete-expense-income`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer= ${token}`,
+                    "documentid": documentID
+                }
+            })
+
+            const data = await request.json()
+
+            return data
+
+        }catch(err){
+            console.log(err)
+        }
+    }
+
     //display elements    
     //page load => core function => 
     //getAll function if there is data => 
@@ -121,6 +142,9 @@ const CORE_FUNCTION = (data, token) =>{
 
         const EXPENSES_WRAPPER = document.querySelector(".expenses-wrapper")
         const INCOME_WRAPPER = document.querySelector(".income-wrapper")
+
+        const EXPENSES_WRAPPER_PARENT = document.querySelector(".this-month-expenses")
+        const INCOME_WRAPPER_PARENT = document.querySelector(".this-month-income")
         
         const ADDITIONAL_ELEMENT = document.querySelector(".additional-element")
 
@@ -286,16 +310,17 @@ const CORE_FUNCTION = (data, token) =>{
                 const parent = document.querySelector(".parent")
                 parent.classList.add("show")
 
+
+                parent.addEventListener("click", (e)=>{
+                    e.stopPropagation()
+                })
+
                 if(parent.clientHeight >= window.innerHeight - 40){
                     ADDITIONAL_ELEMENT.style.alignItems = "baseline"
                     ADDITIONAL_ELEMENT.style.overflowY = "auto"
                 }else{
                     ADDITIONAL_ELEMENT.style.alignItems = "center"
                 }
-
-                parent.addEventListener("click", (e)=>{
-                    e.stopPropagation()
-                })
 
                 //WINDOW EVENT CLOSING EVERYHTING
                 window.addEventListener("click", ()=>{
@@ -964,6 +989,7 @@ const CORE_FUNCTION = (data, token) =>{
                             expenseData = await getAllUserCreated()
                             setElementInitially()
                             barChartSet()
+                            expensesIncomeList()
                         }else{
                             createButton.classList.remove("invalid")
                             console.log(sendCreateReq)
@@ -1359,6 +1385,7 @@ const CORE_FUNCTION = (data, token) =>{
                             expenseData = await getAllUserCreated()
                             setElementInitially()
                             barChartSet()
+                            expensesIncomeList()
                         }else{
                             createButton.classList.remove("invalid")
                             console.log(sendCreateReq)
@@ -2339,6 +2366,172 @@ const CORE_FUNCTION = (data, token) =>{
                     })
                 }
 
+                //loop to show all data and have edit and delete buttons
+                const showAllDetailed = (data, type) =>{
+                    document.body.style.overflow = "hidden"
+                    ADDITIONAL_ELEMENT.classList.add("show")
+                    ADDITIONAL_ELEMENT.innerHTML = `
+                    <div class="parent">
+                        <div class="detailed-data">
+                            <span class="overview-title">${type==="expense" ? "Detailed Expenses" : "Detailed Income"}</span>
+
+                            <div class="detailed-wrapper">
+
+                            </div>
+                        </div>
+                    </div>
+                    `
+
+                    const wrapper = document.querySelector(".detailed-wrapper")
+                    for(let i = 0; i < data.length; i++){
+                        const element = document.createElement("div")
+                        element.classList.add("detailed-income-expense")
+
+                        element.innerHTML = `
+                        <div class="details">
+                            <div>
+                                <span>${formatCategory(data[i].typeofExpenseIncome)}</span>
+                                ,<span> ${formatExpense(data[i].subtypeofExpenseIncome)}</span>
+                            </div>
+                            <div>
+                                <span>${Number(data[i].amount).toLocaleString("en-US", {
+                                style: "currency",
+                                currency: "USD",
+                                maximumFractionDigits: 2,
+                                minimumFractionDigits: 2
+                            })}</span>
+                            ,<span> ${data[i].recurring === true ? "Recurring" : "One-time" }</span>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <div class="edit"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z"/></svg></div>
+                            <div class="delete"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></svg></div>
+                       </div>
+                        `
+                        wrapper.appendChild(element)
+                    }
+
+                    const parent = document.querySelector(".parent")
+                    parent.classList.add("show")
+
+                    if(parent.clientHeight >= window.innerHeight - 40){
+                        ADDITIONAL_ELEMENT.style.alignItems = "baseline"
+                        ADDITIONAL_ELEMENT.style.overflowY = "auto"
+                    }else{
+                        ADDITIONAL_ELEMENT.style.alignItems = "center"
+                    }
+
+                    parent.addEventListener("click", (e)=>{
+                        e.stopPropagation()
+                    })
+
+                    //WINDOW EVENT CLOSING EVERYHTING
+                    window.addEventListener("click", ()=>{
+                        if(parent.classList.contains("show")){
+                            parent.classList.remove("show")
+                            parent.classList.add("hide")
+        
+                            ADDITIONAL_ELEMENT.classList.remove("show")
+                            ADDITIONAL_ELEMENT.classList.add("hide")
+        
+                            parent.addEventListener("animationend", ()=>{
+                                parent.classList.remove("hide")
+                                ADDITIONAL_ELEMENT.classList.remove("hide")
+                                document.body.style.overflow = "auto"
+
+                                ADDITIONAL_ELEMENT.innerHTML =``
+                            })
+
+                            barChartSet()
+                            donutsChartSet()
+                            expensesIncomeList()
+                        }
+                    })
+
+                    const deletingTaskQuestion = (id, type) =>{
+
+                        const deleteElement = document.createElement("div")
+                        deleteElement.classList.add("deleting-choice")
+                        deleteElement.innerHTML = `
+                        <div>
+                            <span>Are you sure you want to delete this ${type}?</span>
+                            <div>
+                                <div class="cancel-del">Cancel</div>
+                                <div class="delete-btn">Delete</div>
+                            </div>
+                        </div>
+                        `
+                        document.body.appendChild(deleteElement)
+
+                        const deleteBody = document.querySelector(".deleting-choice > div")
+                        deleteBody.addEventListener("click", (e)=> e.stopPropagation())
+
+                        //button cancel
+                        const cancel = document.querySelector(".cancel-del")
+                        cancel.addEventListener("click", ()=>{
+                            deleteElement.remove()
+                        })
+
+                        //delete req and close all
+                        const deleteBtn = document.querySelector(".delete-btn")
+                        deleteBtn.addEventListener("click", async ()=>{
+                            if(deleteBtn.classList.contains("pending")){
+                                return
+                            }
+
+                            deleteBtn.classList.add("pending")
+
+                            const deleteRequest = await deleteExpenseIncome(id)
+
+                            if(deleteRequest.success){
+                                setTimeout(() => {
+                                    deleteElement.remove()
+    
+                                    parent.classList.remove("show")
+                                    parent.classList.add("hide")
+                
+                                    ADDITIONAL_ELEMENT.classList.remove("show")
+                                    ADDITIONAL_ELEMENT.classList.add("hide")
+                
+                                    parent.addEventListener("animationend", ()=>{
+                                        parent.classList.remove("hide")
+                                        ADDITIONAL_ELEMENT.classList.remove("hide")
+                                        document.body.style.overflow = "auto"
+    
+                                        ADDITIONAL_ELEMENT.innerHTML = ``
+                                    })
+                                }, 500);
+                                
+                                expenseData = await getAllUserCreated()
+                                barChartSet()
+                                donutsChartSet()
+                                expensesIncomeList()
+                            }else{
+                                deleteElement.remove()
+                            }
+
+                        })
+
+                        //close wrapper / window close
+                        deleteElement.addEventListener("click", (e)=>{
+                            e.stopPropagation()
+                            deleteElement.remove()
+                        })
+                    }
+
+                    //DELETING DATA
+                    const delBtn = document.querySelectorAll(".delete")
+                    for(let i = 0; i < delBtn.length; i++){
+                        delBtn[i].addEventListener("click", ()=>{
+                            deletingTaskQuestion(data[i]._id, type)
+                        })
+                    }
+
+                    //EDIT DATA
+                    
+                }
+
                 //filter the data like the donut chart
                 //only show this month expense/income or recurring
                 const allUserData = expenseData.data
@@ -2372,13 +2565,21 @@ const CORE_FUNCTION = (data, token) =>{
                 })
 
                 if(expensesArray.length){
+                    EXPENSES_WRAPPER.innerHTML = ``
                     const sortedByAmountEXPENSES = expensesArray.toSorted((a, b) => b.amount - a.amount)
 
                     showSomeData(sortedByAmountEXPENSES)
-                    EXPENSES_WRAPPER.classList.add("show-expenses")
+                    EXPENSES_WRAPPER_PARENT.classList.add("show-expenses")
                     EXPENSES_WRAPPER.style.justifyContent = "space-between"
+
+                    EXPENSES_WRAPPER_PARENT.addEventListener("click", (e)=>{
+                        if(EXPENSES_WRAPPER_PARENT.classList.contains("show-expenses")){
+                            e.stopPropagation()
+                            showAllDetailed(sortedByAmountEXPENSES, "expense")
+                        }
+                    }, {once:true})
                 }else{
-                    EXPENSES_WRAPPER.classList.remove("show-expenses")
+                    EXPENSES_WRAPPER_PARENT.classList.remove("show-expenses")
                     EXPENSES_WRAPPER.innerHTML = `
                     <span class="no-data">You don't track any expenses currently!</span>
                     `
@@ -2386,14 +2587,22 @@ const CORE_FUNCTION = (data, token) =>{
                 }
 
                 if(incomesArray.length){
+                    INCOME_WRAPPER.innerHTML = ``
                     const sortedByAmountINCOME = incomesArray.toSorted((a, b) => b.amount - a.amount)
 
                     showSomeData(sortedByAmountINCOME)
-                    INCOME_WRAPPER.classList.add("show-expenses")
+                    INCOME_WRAPPER_PARENT.classList.add("show-expenses")
                     INCOME_WRAPPER.style.justifyContent = "space-between"
+
+                    INCOME_WRAPPER_PARENT.addEventListener("click", (e)=>{
+                        if(INCOME_WRAPPER_PARENT.classList.contains("show-expenses")){
+                            e.stopPropagation()
+                            showAllDetailed(sortedByAmountINCOME, "income")
+                        }
+                    }, {once:true})
                 }else{
-                    INCOME_WRAPPER.classList.remove("show-expenses")
-                    EXPENSES_WRAPPER.innerHTML = `
+                    INCOME_WRAPPER_PARENT.classList.remove("show-expenses")
+                    INCOME_WRAPPER.innerHTML = `
                     <span class="no-data">You don't track any income currently!</span>
                     `
                     INCOME_WRAPPER.style.justifyContent = "center"
@@ -2410,8 +2619,8 @@ const CORE_FUNCTION = (data, token) =>{
                 EXPENSES_WRAPPER.style.justifyContent = "center"
                 INCOME_WRAPPER.style.justifyContent = "center"
 
-                EXPENSES_WRAPPER.classList.remove("show-expenses")
-                INCOME_WRAPPER.classList.remove("show-expenses")
+                EXPENSES_WRAPPER_PARENT.classList.remove("show-expenses")
+                INCOME_WRAPPER_PARENT.classList.remove("show-expenses")
             }
         }
         expensesIncomeList()
