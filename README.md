@@ -28,24 +28,23 @@ Whether you're accessing the app from a desktop, tablet, or smartphone, the resp
 To get started with the Expense Tracker App locally, follow these steps:
 
 1. **Clone the Repository**:
+
    ```bash
-   git clone https://github.com/rundownJSexpense-tracker.git
+   git clone https://github.com/rundownJS/expense-tracker.git
    cd expense-tracker
 
 2. **Install Dependencies**:
 
-To install dependencies, run the following command in your terminal:
-
-    `npm install`
+`npm install`
 
 3. **Run the Application**:
 
-To start the application, use the following command:
-
-    `npm start`
+`npm start`
 
 4. **View the Application**:
 
 Open [http://localhost:5001/register](http://localhost:5001/register) in your web browser to view the app.
 
-## Explore and Enjoy
+---
+
+### Explore and Enjoy
