@@ -11,12 +11,13 @@ const helmet = require("helmet")
 const XSS = require("xss-clean")
 const cors = require("cors")
 const path = require("path")
-const Chart = require('chart.js');
+const rateLimit = require("express-rate-limit")
 
 const PORT = process.env.PORT || 5001
 
 const authRouter = require("./router/auth")
 const expensesRouter = require("./router/expenses")
+
 
 //security
 app.use(helmet())
@@ -27,11 +28,24 @@ app.use(antiXSS)
 app.use(express.json())
 app.set("trust proxy", 1)
 
+//request limiter
+const limiter = rateLimit({
+    windowMs: 10 * 60 * 1000, //10 minutes
+    max: 1000,
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: (req, res) =>{
+        res.status(429).json({ 
+            message: "Too many requests, please try again later." 
+        })
+    }
+})
+
 //register/login route
-app.use("/expenses-tracker/api/v1/authUser", authRouter)
+app.use("/expenses-tracker/api/v1/authUser", limiter, authRouter)
 
 //expenses route => create/update/delete/get
-app.use("/expenses-tracker/api/v1/expenses", authMiddleware, expensesRouter)
+app.use("/expenses-tracker/api/v1/expenses", limiter, authMiddleware, expensesRouter)
 
 //serve client files
 app.use(express.static(path.join(__dirname, "public")))
