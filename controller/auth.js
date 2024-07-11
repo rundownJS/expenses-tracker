@@ -2,6 +2,7 @@ const User = require("../model/user")
 const bcrpyt = require("bcryptjs")
 const JWT = require("jsonwebtoken")
 const { BadRequestError, Unauthorized } = require("../errors")
+require("dotenv")
 
 const registerUser = async (req, res) =>{
 
@@ -10,7 +11,7 @@ const registerUser = async (req, res) =>{
     if(firstName && lastName && password && email){
 
         //verify the recaptcha 
-        const recaptchaSECRET_KEY = "6Lfu3PopAAAAAGUWxXhPeP9eWHQ4Z_FrzjsYIbcD"
+        const recaptchaSECRET_KEY = process.env.SECRET_KEY
         const recaptchaResponse = req.body["g-recaptcha-response"]
 
         if(!recaptchaResponse){
@@ -50,7 +51,7 @@ const loginUser = async (req, res) =>{
         return res.status(400).json({msg: "Please provide email and password"})
     }
 
-    const recaptchaSECRET_KEY = "6Lfu3PopAAAAAGUWxXhPeP9eWHQ4Z_FrzjsYIbcD"
+    const recaptchaSECRET_KEY = process.env.SECRET_KEY
     const recaptchaResponse = req.body["g-recaptcha-response"]
 
     if(!recaptchaResponse){

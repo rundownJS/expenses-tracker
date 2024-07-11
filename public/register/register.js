@@ -6,6 +6,7 @@ const passwordStrengthElement = document.querySelector(".password-strength-wrapp
 const allErrorSpans = document.querySelectorAll(".error-span")
 const CAPTCHA_CONTAINER = document.querySelector(".recaptcha-container")
 
+
 for(let i = 0; i < allInputFields.length - 1; i++){
     
     allInputFields[i].addEventListener("focus", ()=>{

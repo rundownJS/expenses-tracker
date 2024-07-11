@@ -129,6 +129,26 @@ const CORE_FUNCTION = (data, token) =>{
         }
     }
 
+    //edit data
+    const editExpenseIncome = async (reqBody) =>{
+        try{
+            const patchRequest = await fetch(`/expenses-tracker/api/v1/expenses/update-expense-income`, {
+                method: "PATCH",
+                headers: {
+                    "Authorization": `Bearer= ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: reqBody
+            })
+
+            const response = await patchRequest.json()
+
+            return response
+        }catch(err){
+            console.log(err)
+        }
+    }
+
     //display elements    
     //page load => core function => 
     //getAll function if there is data => 
@@ -334,7 +354,7 @@ const CORE_FUNCTION = (data, token) =>{
                         parent.addEventListener("animationend", ()=>{
                             parent.classList.remove("hide")
                             ADDITIONAL_ELEMENT.classList.remove("hide")
-                            document.body.style.overflow = "auto"
+                            document.body.style.overflowY = "auto"
 
                             ADDITIONAL_ELEMENT.innerHTML =``
                         })
@@ -356,7 +376,7 @@ const CORE_FUNCTION = (data, token) =>{
                         parent.addEventListener("animationend", ()=>{
                             parent.classList.remove("hide")
                             ADDITIONAL_ELEMENT.classList.remove("hide")
-                            document.body.style.overflow = "auto"
+                            document.body.style.overflowY = "auto"
 
                             ADDITIONAL_ELEMENT.innerHTML =``
                         })
@@ -604,6 +624,8 @@ const CORE_FUNCTION = (data, token) =>{
                 document.body.style.overflow = "hidden"
                 ADDITIONAL_ELEMENT.classList.add("show")
 
+                
+
                 //WHEN CALLING THIS FUNCTION IT OPENS THE CREATE CARD
                 ADDITIONAL_ELEMENT.innerHTML = `
                 <div class="parent">
@@ -808,7 +830,7 @@ const CORE_FUNCTION = (data, token) =>{
                         parent.addEventListener("animationend", ()=>{
                             parent.classList.remove("hide")
                             ADDITIONAL_ELEMENT.classList.remove("hide")
-                            document.body.style.overflow = "auto"
+                            document.body.style.overflowY = "auto"
 
                             ADDITIONAL_ELEMENT.innerHTML =``
                         })
@@ -911,6 +933,10 @@ const CORE_FUNCTION = (data, token) =>{
                     extraInfoText.style.display = "none"
                 })
 
+                if(window.innerWidth < 550){
+                    parent.style.width = "unset"
+                }
+
                 //WINDOW EVENT CLOSING EVERYHTING
                 window.addEventListener("click", ()=>{
                     if(parent.classList.contains("show")){
@@ -923,7 +949,7 @@ const CORE_FUNCTION = (data, token) =>{
                         parent.addEventListener("animationend", ()=>{
                             parent.classList.remove("hide")
                             ADDITIONAL_ELEMENT.classList.remove("hide")
-                            document.body.style.overflow = "auto"
+                            document.body.style.overflowY = "auto"
 
                             ADDITIONAL_ELEMENT.innerHTML =``
                         })
@@ -979,7 +1005,7 @@ const CORE_FUNCTION = (data, token) =>{
                                 parent.addEventListener("animationend", ()=>{
                                     parent.classList.remove("hide")
                                     ADDITIONAL_ELEMENT.classList.remove("hide")
-                                    document.body.style.overflow = "auto"
+                                    document.body.style.overflowY = "auto"
 
                                     ADDITIONAL_ELEMENT.innerHTML =``
                                 })
@@ -1006,6 +1032,8 @@ const CORE_FUNCTION = (data, token) =>{
 
                 document.body.style.overflow = "hidden"
                 ADDITIONAL_ELEMENT.classList.add("show")
+
+                
 
                 //WHEN CALLING THIS FUNCTION IT OPENS THE CREATE CARD
                 ADDITIONAL_ELEMENT.innerHTML = `
@@ -1204,7 +1232,7 @@ const CORE_FUNCTION = (data, token) =>{
                         parent.addEventListener("animationend", ()=>{
                             parent.classList.remove("hide")
                             ADDITIONAL_ELEMENT.classList.remove("hide")
-                            document.body.style.overflow = "auto"
+                            document.body.style.overflowY = "auto"
 
                             ADDITIONAL_ELEMENT.innerHTML =``
                         })
@@ -1307,6 +1335,10 @@ const CORE_FUNCTION = (data, token) =>{
                     extraInfoText.style.display = "none"
                 })
 
+                if(window.innerWidth < 550){
+                    parent.style.width = "unset"
+                }
+
                 //WINDOW EVENT CLOSING EVERYHTING
                 window.addEventListener("click", ()=>{
                     if(parent.classList.contains("show")){
@@ -1319,7 +1351,7 @@ const CORE_FUNCTION = (data, token) =>{
                         parent.addEventListener("animationend", ()=>{
                             parent.classList.remove("hide")
                             ADDITIONAL_ELEMENT.classList.remove("hide")
-                            document.body.style.overflow = "auto"
+                            document.body.style.overflowY = "auto"
 
                             ADDITIONAL_ELEMENT.innerHTML =``
                         })
@@ -1375,7 +1407,7 @@ const CORE_FUNCTION = (data, token) =>{
                                 parent.addEventListener("animationend", ()=>{
                                     parent.classList.remove("hide")
                                     ADDITIONAL_ELEMENT.classList.remove("hide")
-                                    document.body.style.overflow = "auto"
+                                    document.body.style.overflowY = "auto"
 
                                     ADDITIONAL_ELEMENT.innerHTML =``
                                 })
@@ -1637,7 +1669,7 @@ const CORE_FUNCTION = (data, token) =>{
                         parent.addEventListener("animationend", ()=>{
                             parent.classList.remove("hide")
                             ADDITIONAL_ELEMENT.classList.remove("hide")
-                            document.body.style.overflow = "auto"
+                            document.body.style.overflowY = "auto"
 
                             ADDITIONAL_ELEMENT.innerHTML =``
                             ADDITIONAL_ELEMENT.style.overflowY = "hidden"
@@ -1660,7 +1692,7 @@ const CORE_FUNCTION = (data, token) =>{
                         parent.addEventListener("animationend", ()=>{
                             parent.classList.remove("hide")
                             ADDITIONAL_ELEMENT.classList.remove("hide")
-                            document.body.style.overflow = "auto"
+                            document.body.style.overflowY = "auto"
 
                             ADDITIONAL_ELEMENT.innerHTML =``
                         })
@@ -1919,7 +1951,7 @@ const CORE_FUNCTION = (data, token) =>{
                         parent.addEventListener("animationend", ()=>{
                             parent.classList.remove("hide")
                             ADDITIONAL_ELEMENT.classList.remove("hide")
-                            document.body.style.overflow = "auto"
+                            document.body.style.overflowY = "auto"
 
                             ADDITIONAL_ELEMENT.innerHTML =``
                             ADDITIONAL_ELEMENT.style.overflowY = "hidden"
@@ -1942,7 +1974,7 @@ const CORE_FUNCTION = (data, token) =>{
                         parent.addEventListener("animationend", ()=>{
                             parent.classList.remove("hide")
                             ADDITIONAL_ELEMENT.classList.remove("hide")
-                            document.body.style.overflow = "auto"
+                            document.body.style.overflowY = "auto"
 
                             ADDITIONAL_ELEMENT.innerHTML =``
                         })
@@ -2248,7 +2280,7 @@ const CORE_FUNCTION = (data, token) =>{
         }
         donutsChartSet()
 
-        //LAST SEGMENT
+        //FULLY DONE
         const expensesIncomeList = () =>{
 
             if(expenseData.data){
@@ -2438,7 +2470,7 @@ const CORE_FUNCTION = (data, token) =>{
                             parent.addEventListener("animationend", ()=>{
                                 parent.classList.remove("hide")
                                 ADDITIONAL_ELEMENT.classList.remove("hide")
-                                document.body.style.overflow = "auto"
+                                document.body.style.overflowY = "auto"
 
                                 ADDITIONAL_ELEMENT.innerHTML =``
                             })
@@ -2449,7 +2481,8 @@ const CORE_FUNCTION = (data, token) =>{
                         }
                     })
 
-                    const deletingTaskQuestion = (id, type) =>{
+                    //DELETING DATA QUESTION + FUNCTIONALITY
+                    const deletingDataQuestion = (id, type) =>{
 
                         const deleteElement = document.createElement("div")
                         deleteElement.classList.add("deleting-choice")
@@ -2497,7 +2530,7 @@ const CORE_FUNCTION = (data, token) =>{
                                     parent.addEventListener("animationend", ()=>{
                                         parent.classList.remove("hide")
                                         ADDITIONAL_ELEMENT.classList.remove("hide")
-                                        document.body.style.overflow = "auto"
+                                        document.body.style.overflowY = "auto"
     
                                         ADDITIONAL_ELEMENT.innerHTML = ``
                                     })
@@ -2520,16 +2553,870 @@ const CORE_FUNCTION = (data, token) =>{
                         })
                     }
 
+                    //EDITING DATA
+                    editExpense = (data) =>{
+
+                        const { typeofExpenseIncome:category, subtypeofExpenseIncome:expense, amount, recurring } = data
+                        
+                        //FINAL USED IN REQUEST
+                        let FINAL_CATEGORY = category
+                        let FINAL_EXPENSE = expense
+                        let RECURRING = recurring
+                        let FINAL_AMOUNT_VALUE = amount
+
+                        //THE DOCUMENT TO EDIT
+                        const documentID = data._id
+        
+                        document.body.style.overflow = "hidden"
+                        ADDITIONAL_ELEMENT.classList.add("show")
+        
+                        //WHEN CALLING THIS FUNCTION IT OPENS THE CREATE CARD
+                        ADDITIONAL_ELEMENT.innerHTML = `
+                        <div class="parent">
+                            <div class="edit-card">
+                                <span class="edit-title">Edit Expense</span>
+        
+                                <span class="small-text">Category</span>
+        
+                                <div class="category-dropdown-wrapper">
+                                    <div class="dropdown-parent">
+                                        <span>${formatCategory(category)}</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
+                                    </div>
+        
+                                    <div class="dropdown-absolute">
+                                        <span data-category="housing" class="pick">Housing</span>
+                                        <span data-category="transportation" class="pick">Transportation</span>
+                                        <span data-category="food" class="pick">Food</span>
+                                        <span data-category="utilities" class="pick">Utilities</span>
+                                        <span data-category="health_wellness" class="pick">Health & Wellness</span>
+                                        <span data-category="debt" class="pick">Debt</span>
+                                        <span data-category="entertainment" class="pick">Entertainment</span>
+                                        <span data-category="clothing" class="pick">Clothing</span>
+                                        <span data-category="personal_care" class="pick">Personal Care</span>
+                                        <span data-category="education" class="pick">Education</span>
+                                        <span data-category="gifts_donations" class="pick">Gifts & Donations</span>
+                                        <span data-category="miscellaneous" class="pick">Miscellaneous</span>
+                                        <span data-category="other" class="pick">Other</span>
+                                    </div>
+                                </div>
+        
+                                <span class="small-text">Expense</span>
+        
+                                <div class="expense-dropdown-wrapper">
+                                    <div class="dropdown-parent-second">
+                                        <span>${formatExpense(expense)}</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
+                                    </div>
+        
+                                    <div class="dropdown-absolute-second"></div>
+                                </div>
+        
+        
+                                <div class="recurring-wrap">
+                                    <span>Is the expense Recurring?</span>
+                                    <span class="extra-info">?</span>
+        
+                                    <span class="info-absolute">Will the expense occur every month, or is it a one-time expense?</span>
+                                </div>
+        
+                                <div class="recurring-yes-no-wrap">
+                                    <span class="recurring-yes ${recurring===true ? "selected": ""}">Yes</span>
+                                    <span class="recurring-no ${recurring===false ? "selected" : ""}">No</span>
+                                </div>
+        
+        
+                                <span class="small-text">Amount ($)</span>
+        
+                                <div class="input-wrapper">
+                                    <input min="1" max="9999999" value="${amount}" id="expense-amount" type="number" placeholder="E.g. $1,000">
+        
+                                    <span class="error-text number"></span>
+                                </div>
+        
+                                <div class="buttons-wrapper">
+                                    <div class="cancel">Cancel</div>
+                                    <div class="edit-btn invalid">Edit</div>
+                                </div>
+        
+                                <div class="successful">
+                                    <div>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"/></svg>
+                                    </div>
+                                    <span>Edited</span>
+                                </div>
+                            </div>
+                        </div>
+                        `
+                        ADDITIONAL_ELEMENT.style.alignItems = "center"
+        
+                        //ERROR SPANS
+                        const amount_error = document.querySelector(".error-text.number")
+        
+                        //DROPDOWNS
+                        const dropdownParent = document.querySelector(".dropdown-parent")
+                        const dropdownAbsolute = document.querySelector(".dropdown-absolute")
+                        const categoryPicks = document.querySelectorAll(".pick")
+        
+                        const categorySpan = document.querySelector(".dropdown-parent > span")
+        
+                        //second dropdown
+                        const dropdownSECOND = document.querySelector(".dropdown-parent-second")
+                        const dropdownAbsoluteSECOND = document.querySelector(".dropdown-absolute-second")
+                        
+                        const expenseSpan = document.querySelector(".dropdown-parent-second > span")
+        
+                        //DROPDOWN EVENT
+                        dropdownParent.addEventListener("click", (e)=>{
+                            e.stopPropagation()
+                            dropdownAbsolute.style.display = "flex"
+                            dropdownAbsoluteSECOND.style.display = "none"
+                            extraInfoText.style.display = "none"
+                        })
+
+                        //THE SECOND DROPDOWN EVENT HANDLER
+                        const eventHandlerExpense = (index) =>{
+                            const allPossibleExpenses = [
+                                ["rent", "mortgage", "property tax", "home insurance", "repairs & maintenance"],
+                                ["car payment", "car insurance", "fuel", "public transport", "parking fees", "ride-sharing (uber, lyft)"],
+                                ["groceries", "dining out", "delivery services", "coffee", "snacks"],
+                                ["electricity", "water", "gas", "internet", "cable/satellite", "phone"],
+                                ["doctor visits", "prescription medications", "over-the-counter medications", "gym membership", "therapy"],
+                                ["credit card payment", "student loan payment", "personal loan payment", "other debt payments"],
+                                ["movies", "concerts", "subscriptions (netflix, spotify)", "magazines", "hobbies"],
+                                ["everyday clothing", "work attire", "shoes", "accessories", "dry cleaning"],
+                                ["haircut/styling", "skin care products", "cosmetics", "toiletries"],
+                                ["tuition", "books & supplies", "courses/classes", "online courses"],
+                                ["gifts", "charity donations"],
+                                ["pet care", "childcare", "home supplies", "legal fees", "travel"],
+                                ["other"]
+                            ]
+        
+                            const replaceCharacters = (str) =>{
+                                const words = str.split(/(\s+|\(|\)|\/|,)/)
+        
+                                const wordCount = words.filter(word => /\w/.test(word)).length
+        
+                                for(let i = 0; i < words.length; i++){
+                                    if (/\w/.test(words[i])){
+                                        words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1)
+                                    }
+                                }
+                                
+                                return words.join("")
+                            }
+        
+                            dropdownAbsoluteSECOND.style.minWidth = dropdownSECOND.clientWidth + "px"
+                            dropdownAbsoluteSECOND.innerHTML = ``
+                            for(let j = 0; j < allPossibleExpenses[index].length; j++){
+                                //console.log(replaceCharacters(allPossibleExpenses[index][j]))
+        
+                                const expensePick = document.createElement("span")
+                                expensePick.classList.add("expense-pick")
+        
+                                if(allPossibleExpenses[index].length <= 3){
+                                    expensePick.style.padding = "5px 8px"
+                                }
+        
+                                expensePick.dataset.expense = allPossibleExpenses[index][j]
+                                expensePick.textContent = replaceCharacters(allPossibleExpenses[index][j])
+        
+                                dropdownAbsoluteSECOND.appendChild(expensePick)
+        
+                                expensePick.addEventListener("click", ()=>{
+                                    expenseSpan.textContent = replaceCharacters(allPossibleExpenses[index][j])
+                                    FINAL_EXPENSE = allPossibleExpenses[index][j]
+        
+                                    validRequestChecker()
+                                })
+                            }
+                        }
+        
+                        for(let i = 0; i < categoryPicks.length; i++){
+                            categoryPicks[i].addEventListener("click", ()=>{
+                                //console.log(categoryPicks[i].dataset.category)
+                                
+                                categorySpan.dataset.category = categoryPicks[i].dataset.category
+                                categorySpan.textContent = categoryPicks[i].textContent
+                                
+                                if(dropdownSECOND.classList.contains("disabled")){
+                                    dropdownSECOND.classList.remove("disabled")
+                                }
+                                expenseSpan.textContent = "Choose Expense"
+                                FINAL_CATEGORY = categoryPicks[i].dataset.category
+                                FINAL_EXPENSE = ""
+        
+                                eventHandlerExpense(i)
+                                validRequestChecker()
+                            })
+
+                            if(FINAL_CATEGORY === categoryPicks[i].dataset.category){
+                                eventHandlerExpense(i)
+                            }
+                        }
+        
+                        dropdownSECOND.addEventListener("click", (e)=>{
+                            if(!dropdownSECOND.classList.contains("disabled")){
+                                e.stopPropagation()
+                                dropdownAbsoluteSECOND.style.display = "flex"
+                                dropdownAbsolute.style.display = "none"
+                                extraInfoText.style.display = "none"
+                            }
+                        })
+        
+                        //CANCEL BUTTON FUNCTIONALITY
+                        //IF THERE ARE EXPENSES IT WILL CALL THE CHART
+                        const cancelButton = document.querySelector(".cancel")
+                        cancelButton.addEventListener("click", ()=>{
+                            if(parent.classList.contains("show")){
+                                parent.classList.remove("show")
+                                parent.classList.add("hide")
+            
+                                ADDITIONAL_ELEMENT.classList.remove("show")
+                                ADDITIONAL_ELEMENT.classList.add("hide")
+            
+                                parent.addEventListener("animationend", ()=>{
+                                    parent.classList.remove("hide")
+                                    ADDITIONAL_ELEMENT.classList.remove("hide")
+                                    document.body.style.overflowY = "auto"
+        
+                                    ADDITIONAL_ELEMENT.innerHTML =``
+                                })
+        
+                                barChartSet()
+                                donutsChartSet()
+                            }
+                        })
+        
+                        //RECURRING FUNCTIONALITY
+                        const recurringButtonYes = document.querySelector(".recurring-yes")
+                        const recurringButtonNo = document.querySelector(".recurring-no")
+                        const recurringExtraInfo = document.querySelector(".extra-info")
+        
+                        recurringButtonNo.addEventListener("click", ()=>{
+                            recurringButtonYes.classList.remove("selected")
+                            recurringButtonNo.classList.add("selected")
+        
+                            validRequestChecker()
+                            RECURRING = false
+                        })
+                        recurringButtonYes.addEventListener("click", ()=>{
+                            recurringButtonYes.classList.add("selected")
+                            recurringButtonNo.classList.remove("selected")
+        
+                            validRequestChecker()
+                            RECURRING = true
+                        })
+        
+                        //EXTRA INFO ON HOVER (CLICK ON A SMALLER SCREEN)
+                        const extraInfoText = document.querySelector(".info-absolute")
+                        recurringExtraInfo.addEventListener("click", (e)=>{
+                            if(window.innerWidth < 600){
+                                e.stopPropagation()
+                                extraInfoText.style.display = "block"
+                                dropdownAbsolute.style.display = "none"
+                                dropdownAbsoluteSECOND.style.display = "none"
+                            }
+                        })
+                        recurringExtraInfo.addEventListener("mouseover", ()=>{
+                            if(window.innerWidth >= 600){
+                                extraInfoText.style.display = "block"
+                            }
+                        })
+                        recurringExtraInfo.addEventListener("mouseleave", ()=>{
+                            if(window.innerWidth >= 600){
+                                extraInfoText.style.display = "none"
+                            }
+                        })
+
+                        
+        
+                        //INPUT VALIDATING
+                        const amountNumberInput = document.querySelector("#expense-amount")
+                        amountNumberInput.addEventListener("keypress", (e)=>{
+                            //based on the keycode only keep the numbers and decimal dot (".")
+                            //console.log(e.keyCode)
+                            const charCode = (e.which) ? e.which : e.keyCode
+                            const number_amount = amountNumberInput.value
+                            const dotIndex = number_amount.indexOf(".")
+        
+                            if(number_amount.startsWith("0")){
+                                e.preventDefault()
+                            }
+                            if(number_amount.length === 0 && charCode === 46){
+                                e.preventDefault()
+                            }
+        
+                            if(charCode > 31 && (charCode !== 46 && (charCode < 48 || charCode > 57))){
+                                e.preventDefault()
+                            }else if(dotIndex !== -1 && number_amount.length - dotIndex > 2 && (charCode >= 48 && charCode <= 57)){
+                                //prevent more than 2 after the decimal
+                                e.preventDefault()
+                            }
+        
+                        })
+                        amountNumberInput.addEventListener("input", ()=>{
+                            const inputAsNumber = Number(amountNumberInput.value)
+                            
+                            amountNumberInput.classList.remove("invalid")
+                            amount_error.textContent = ""
+        
+                            if(amountNumberInput.value.length && inputAsNumber < 1){
+                                
+                                amountNumberInput.classList.add("invalid")
+                                amount_error.textContent = "Amount should be at least $1!"
+                            }else if(amountNumberInput.value.length && inputAsNumber > 9999999){
+                                
+                                amountNumberInput.classList.add("invalid")
+                                amount_error.textContent = "Amount should be less than $9,999,999"
+                            }
+        
+                            FINAL_AMOUNT_VALUE = inputAsNumber
+                            validRequestChecker()
+                        })
+        
+                        const parent = document.querySelector(".parent")
+                        parent.classList.add("show")
+        
+                        parent.addEventListener("click", (e)=>{
+                            e.stopPropagation()
+                            dropdownAbsolute.style.display = "none"
+                            dropdownAbsoluteSECOND.style.display = "none"
+                            extraInfoText.style.display = "none"
+                        })
+
+                        if(window.innerWidth < 550){
+                            parent.style.width = "unset"
+                        }
+        
+                        //WINDOW EVENT CLOSING EVERYHTING
+                        window.addEventListener("click", ()=>{
+                            if(parent.classList.contains("show")){
+                                parent.classList.remove("show")
+                                parent.classList.add("hide")
+            
+                                ADDITIONAL_ELEMENT.classList.remove("show")
+                                ADDITIONAL_ELEMENT.classList.add("hide")
+            
+                                parent.addEventListener("animationend", ()=>{
+                                    parent.classList.remove("hide")
+                                    ADDITIONAL_ELEMENT.classList.remove("hide")
+                                    document.body.style.overflowY = "auto"
+        
+                                    ADDITIONAL_ELEMENT.innerHTML =``
+                                })
+        
+                                barChartSet()
+                                donutsChartSet()
+                            }
+                        })
+        
+        
+                        //THE VALIDATORS TO ENABLE THE BUTTON
+                        const editButton = document.querySelector(".edit-btn")
+                        const validRequestChecker = () =>{
+                            if(!FINAL_CATEGORY || !FINAL_EXPENSE || FINAL_AMOUNT_VALUE <= 0){
+                                editButton.classList.add("invalid")
+                                return 
+                            }else if(FINAL_AMOUNT_VALUE > 9999999){
+                                editButton.classList.add("invalid")
+                                return 
+                            }
+        
+                            editButton.classList.remove("invalid")
+                            return true
+                        } 
+        
+                        editButton.addEventListener("click", async ()=>{
+                            if(editButton.classList.contains("invalid")){
+                                return
+                            }
+                            
+                            if(validRequestChecker() === true){
+        
+                                const requestObject = {
+                                    "type": "expense",
+                                    "typeofExpenseIncome": FINAL_CATEGORY,
+                                    "subtypeofExpenseIncome": FINAL_EXPENSE,
+                                    "amount": FINAL_AMOUNT_VALUE,
+                                    "documentid": documentID
+                                }
+        
+                                if(RECURRING === true){
+                                    requestObject.recurring = true
+                                }
+                                
+                                editButton.classList.add("invalid")
+                                const sendEditReq = await editExpenseIncome(JSON.stringify(requestObject))
+        
+                                //console.log(sendEditReq)
+                                if(sendEditReq.updateData){
+                                    const successElement = document.querySelector(".successful")
+                                    successElement.style.display = "flex"
+                                    setTimeout(() => {
+                                        parent.classList.remove("show")
+                                        parent.classList.add("hide")
+                    
+                                        ADDITIONAL_ELEMENT.classList.remove("show")
+                                        ADDITIONAL_ELEMENT.classList.add("hide")
+                    
+                                        parent.addEventListener("animationend", ()=>{
+                                            parent.classList.remove("hide")
+                                            ADDITIONAL_ELEMENT.classList.remove("hide")
+                                            document.body.style.overflowY = "auto"
+        
+                                            ADDITIONAL_ELEMENT.innerHTML =``
+                                        })
+        
+                                    }, 1000);
+                                    //MUST REMEMBER COME AND CALL THE SET FUNCTIONS
+                                    expenseData = await getAllUserCreated()
+                                    donutsChartSet()
+                                    barChartSet()
+                                    expensesIncomeList()
+                                }else{
+                                    editButton.classList.remove("invalid")
+                                    console.log(sendEditReq)
+                                }
+                            }
+                        }) 
+                        
+                    }
+
+                    editIncome = (data) => {
+                        const { typeofExpenseIncome:category, subtypeofExpenseIncome:income, amount, recurring } = data
+                        
+                        //FINAL USED IN REQUEST
+                        let FINAL_CATEGORY = category
+                        let FINAL_EXPENSE = income
+                        let RECURRING = recurring
+                        let FINAL_AMOUNT_VALUE = amount
+
+                        //THE DOCUMENT TO EDIT
+                        const documentID = data._id
+        
+                        document.body.style.overflow = "hidden"
+                        ADDITIONAL_ELEMENT.classList.add("show")
+        
+                        //WHEN CALLING THIS FUNCTION IT OPENS THE CREATE CARD
+                        ADDITIONAL_ELEMENT.innerHTML = `
+                        <div class="parent">
+                            <div class="edit-card">
+                                <span class="edit-title">Edit Income</span>
+        
+                                <span class="small-text">Category</span>
+        
+                                <div class="category-dropdown-wrapper">
+                                    <div class="dropdown-parent">
+                                        <span>${formatCategory(category)}</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
+                                    </div>
+        
+                                    <div class="dropdown-absolute">
+                                        <span data-category="salary" class="pick">Salary</span>
+                                        <span data-category="business_income" class="pick">Business Income</span>
+                                        <span data-category="investments" class="pick">Investments</span>
+                                        <span data-category="government_payments" class="pick">Government Payments</span>
+                                        <span data-category="retirement_income" class="pick">Retirement Income</span>
+                                        <span data-category="gifts_inheritance" class="pick">Gifts & Inheritance</span>
+                                        <span data-category="scholarship_grants" class="pick">Scholarship Grants</span>
+                                        <span data-category="other_income" class="pick">Other Income</span>
+                                        <span data-category="other" class="pick">Other</span>
+                                    </div>
+                                </div>
+        
+                                <span class="small-text">Income</span>
+        
+                                <div class="expense-dropdown-wrapper">
+                                    <div class="dropdown-parent-second">
+                                        <span>${formatExpense(income)}</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M201.4 374.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 306.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
+                                    </div>
+        
+                                    <div class="dropdown-absolute-second"></div>
+                                </div>
+        
+        
+                                <div class="recurring-wrap">
+                                    <span>Is the expense Recurring?</span>
+                                    <span class="extra-info">?</span>
+        
+                                    <span class="info-absolute">Will the expense occur every month, or is it a one-time expense?</span>
+                                </div>
+        
+                                <div class="recurring-yes-no-wrap">
+                                    <span class="recurring-yes ${recurring===true ? "selected": ""}">Yes</span>
+                                    <span class="recurring-no ${recurring===false ? "selected" : ""}">No</span>
+                                </div>
+        
+        
+                                <span class="small-text">Amount ($)</span>
+        
+                                <div class="input-wrapper">
+                                    <input min="1" max="9999999" value="${amount}" id="expense-amount" type="number" placeholder="E.g. $1,000">
+        
+                                    <span class="error-text number"></span>
+                                </div>
+        
+                                <div class="buttons-wrapper">
+                                    <div class="cancel">Cancel</div>
+                                    <div class="edit-btn invalid">Edit</div>
+                                </div>
+        
+                                <div class="successful">
+                                    <div>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"/></svg>
+                                    </div>
+                                    <span>Edited</span>
+                                </div>
+                            </div>
+                        </div>
+                        `
+                        ADDITIONAL_ELEMENT.style.alignItems = "center"
+        
+                        //ERROR SPANS
+                        const amount_error = document.querySelector(".error-text.number")
+        
+                        //DROPDOWNS
+                        const dropdownParent = document.querySelector(".dropdown-parent")
+                        const dropdownAbsolute = document.querySelector(".dropdown-absolute")
+                        const categoryPicks = document.querySelectorAll(".pick")
+        
+                        const categorySpan = document.querySelector(".dropdown-parent > span")
+        
+                        //second dropdown
+                        const dropdownSECOND = document.querySelector(".dropdown-parent-second")
+                        const dropdownAbsoluteSECOND = document.querySelector(".dropdown-absolute-second")
+                        
+                        const expenseSpan = document.querySelector(".dropdown-parent-second > span")
+        
+                        //DROPDOWN EVENT
+                        dropdownParent.addEventListener("click", (e)=>{
+                            e.stopPropagation()
+                            dropdownAbsolute.style.display = "flex"
+                            dropdownAbsoluteSECOND.style.display = "none"
+                            extraInfoText.style.display = "none"
+                        })
+
+                        //THE SECOND DROPDOWN EVENT HANDLER
+                        const eventHandlerExpense = (index) =>{
+                            const allPossibleExpenses = [
+                                ["regular salary/wage", "overtime pay", "bonuses", "commision"],
+                                ["sales revenue", "service income", "freelance work", "consulting fees"],
+                                ["dividents", "interest income", "capital gains", "rental income"],
+                                ["social security benefits", "unemployed benefits", "disability benefits", "child support"],
+                                ["pension", "annuities"],
+                                ["cash gifts", "inheritances", "monetary awards"],
+                                ["educational scholarship", "research grants", "fellowships"],
+                                ["royalties", "alimony", "lottery winnings", "sale of assets", "side job/gig"],
+                                ["other"]
+                            ]
+        
+                            const replaceCharacters = (str) =>{
+                                const words = str.split(/(\s+|\(|\)|\/|,)/)
+        
+                                const wordCount = words.filter(word => /\w/.test(word)).length
+        
+                                for(let i = 0; i < words.length; i++){
+                                    if (/\w/.test(words[i])){
+                                        words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1)
+                                    }
+                                }
+                                
+                                return words.join("")
+                            }
+        
+                            dropdownAbsoluteSECOND.style.minWidth = dropdownSECOND.clientWidth + "px"
+                            dropdownAbsoluteSECOND.innerHTML = ``
+                            for(let j = 0; j < allPossibleExpenses[index].length; j++){
+                                //console.log(replaceCharacters(allPossibleExpenses[index][j]))
+        
+                                const expensePick = document.createElement("span")
+                                expensePick.classList.add("expense-pick")
+        
+                                if(allPossibleExpenses[index].length <= 3){
+                                    expensePick.style.padding = "5px 8px"
+                                }
+        
+                                expensePick.dataset.expense = allPossibleExpenses[index][j]
+                                expensePick.textContent = replaceCharacters(allPossibleExpenses[index][j])
+        
+                                dropdownAbsoluteSECOND.appendChild(expensePick)
+        
+                                expensePick.addEventListener("click", ()=>{
+                                    expenseSpan.textContent = replaceCharacters(allPossibleExpenses[index][j])
+                                    FINAL_EXPENSE = allPossibleExpenses[index][j]
+        
+                                    validRequestChecker()
+                                })
+                            }
+                        }
+        
+                        for(let i = 0; i < categoryPicks.length; i++){
+                            categoryPicks[i].addEventListener("click", ()=>{
+                                //console.log(categoryPicks[i].dataset.category)
+                                
+                                categorySpan.dataset.category = categoryPicks[i].dataset.category
+                                categorySpan.textContent = categoryPicks[i].textContent
+                                
+                                if(dropdownSECOND.classList.contains("disabled")){
+                                    dropdownSECOND.classList.remove("disabled")
+                                }
+                                expenseSpan.textContent = "Choose Expense"
+                                FINAL_CATEGORY = categoryPicks[i].dataset.category
+                                FINAL_EXPENSE = ""
+        
+                                eventHandlerExpense(i)
+                                validRequestChecker()
+                            })
+
+                            if(FINAL_CATEGORY === categoryPicks[i].dataset.category){
+                                eventHandlerExpense(i)
+                            }
+                        }
+        
+                        dropdownSECOND.addEventListener("click", (e)=>{
+                            if(!dropdownSECOND.classList.contains("disabled")){
+                                e.stopPropagation()
+                                dropdownAbsoluteSECOND.style.display = "flex"
+                                dropdownAbsolute.style.display = "none"
+                                extraInfoText.style.display = "none"
+                            }
+                        })
+        
+                        //CANCEL BUTTON FUNCTIONALITY
+                        //IF THERE ARE EXPENSES IT WILL CALL THE CHART
+                        const cancelButton = document.querySelector(".cancel")
+                        cancelButton.addEventListener("click", ()=>{
+                            if(parent.classList.contains("show")){
+                                parent.classList.remove("show")
+                                parent.classList.add("hide")
+            
+                                ADDITIONAL_ELEMENT.classList.remove("show")
+                                ADDITIONAL_ELEMENT.classList.add("hide")
+            
+                                parent.addEventListener("animationend", ()=>{
+                                    parent.classList.remove("hide")
+                                    ADDITIONAL_ELEMENT.classList.remove("hide")
+                                    document.body.style.overflowY = "auto"
+        
+                                    ADDITIONAL_ELEMENT.innerHTML =``
+                                })
+        
+                                barChartSet()
+                                donutsChartSet()
+                            }
+                        })
+        
+                        //RECURRING FUNCTIONALITY
+                        const recurringButtonYes = document.querySelector(".recurring-yes")
+                        const recurringButtonNo = document.querySelector(".recurring-no")
+                        const recurringExtraInfo = document.querySelector(".extra-info")
+        
+                        recurringButtonNo.addEventListener("click", ()=>{
+                            recurringButtonYes.classList.remove("selected")
+                            recurringButtonNo.classList.add("selected")
+        
+                            validRequestChecker()
+                            RECURRING = false
+                        })
+                        recurringButtonYes.addEventListener("click", ()=>{
+                            recurringButtonYes.classList.add("selected")
+                            recurringButtonNo.classList.remove("selected")
+        
+                            validRequestChecker()
+                            RECURRING = true
+                        })
+        
+                        //EXTRA INFO ON HOVER (CLICK ON A SMALLER SCREEN)
+                        const extraInfoText = document.querySelector(".info-absolute")
+                        recurringExtraInfo.addEventListener("click", (e)=>{
+                            if(window.innerWidth < 600){
+                                e.stopPropagation()
+                                extraInfoText.style.display = "block"
+                                dropdownAbsolute.style.display = "none"
+                                dropdownAbsoluteSECOND.style.display = "none"
+                            }
+                        })
+                        recurringExtraInfo.addEventListener("mouseover", ()=>{
+                            if(window.innerWidth >= 600){
+                                extraInfoText.style.display = "block"
+                            }
+                        })
+                        recurringExtraInfo.addEventListener("mouseleave", ()=>{
+                            if(window.innerWidth >= 600){
+                                extraInfoText.style.display = "none"
+                            }
+                        })
+        
+                        //INPUT VALIDATING
+                        const amountNumberInput = document.querySelector("#expense-amount")
+                        amountNumberInput.addEventListener("keypress", (e)=>{
+                            //based on the keycode only keep the numbers and decimal dot (".")
+                            //console.log(e.keyCode)
+                            const charCode = (e.which) ? e.which : e.keyCode
+                            const number_amount = amountNumberInput.value
+                            const dotIndex = number_amount.indexOf(".")
+        
+                            if(number_amount.startsWith("0")){
+                                e.preventDefault()
+                            }
+                            if(number_amount.length === 0 && charCode === 46){
+                                e.preventDefault()
+                            }
+        
+                            if(charCode > 31 && (charCode !== 46 && (charCode < 48 || charCode > 57))){
+                                e.preventDefault()
+                            }else if(dotIndex !== -1 && number_amount.length - dotIndex > 2 && (charCode >= 48 && charCode <= 57)){
+                                //prevent more than 2 after the decimal
+                                e.preventDefault()
+                            }
+        
+                        })
+                        amountNumberInput.addEventListener("input", ()=>{
+                            const inputAsNumber = Number(amountNumberInput.value)
+                            
+                            amountNumberInput.classList.remove("invalid")
+                            amount_error.textContent = ""
+        
+                            if(amountNumberInput.value.length && inputAsNumber < 1){
+                                
+                                amountNumberInput.classList.add("invalid")
+                                amount_error.textContent = "Amount should be at least $1!"
+                            }else if(amountNumberInput.value.length && inputAsNumber > 9999999){
+                                
+                                amountNumberInput.classList.add("invalid")
+                                amount_error.textContent = "Amount should be less than $9,999,999"
+                            }
+        
+                            FINAL_AMOUNT_VALUE = inputAsNumber
+                            validRequestChecker()
+                        })
+        
+                        const parent = document.querySelector(".parent")
+                        parent.classList.add("show")
+        
+                        parent.addEventListener("click", (e)=>{
+                            e.stopPropagation()
+                            dropdownAbsolute.style.display = "none"
+                            dropdownAbsoluteSECOND.style.display = "none"
+                            extraInfoText.style.display = "none"
+                        })
+        
+                        //WINDOW EVENT CLOSING EVERYHTING
+                        window.addEventListener("click", ()=>{
+                            if(parent.classList.contains("show")){
+                                parent.classList.remove("show")
+                                parent.classList.add("hide")
+            
+                                ADDITIONAL_ELEMENT.classList.remove("show")
+                                ADDITIONAL_ELEMENT.classList.add("hide")
+            
+                                parent.addEventListener("animationend", ()=>{
+                                    parent.classList.remove("hide")
+                                    ADDITIONAL_ELEMENT.classList.remove("hide")
+                                    document.body.style.overflowY = "auto"
+        
+                                    ADDITIONAL_ELEMENT.innerHTML =``
+                                })
+        
+                                barChartSet()
+                                donutsChartSet()
+                            }
+                        })
+                        if(window.innerWidth < 550){
+                            parent.style.width = "unset"
+                        }
+        
+                        //THE VALIDATORS TO ENABLE THE BUTTON
+                        const editButton = document.querySelector(".edit-btn")
+                        const validRequestChecker = () =>{
+                            if(!FINAL_CATEGORY || !FINAL_EXPENSE || FINAL_AMOUNT_VALUE <= 0){
+                                editButton.classList.add("invalid")
+                                return 
+                            }else if(FINAL_AMOUNT_VALUE > 9999999){
+                                editButton.classList.add("invalid")
+                                return 
+                            }
+        
+                            editButton.classList.remove("invalid")
+                            return true
+                        } 
+        
+                        editButton.addEventListener("click", async ()=>{
+                            if(editButton.classList.contains("invalid")){
+                                return
+                            }
+                            
+                            if(validRequestChecker() === true){
+        
+                                const requestObject = {
+                                    "type": "income",
+                                    "typeofExpenseIncome": FINAL_CATEGORY,
+                                    "subtypeofExpenseIncome": FINAL_EXPENSE,
+                                    "amount": FINAL_AMOUNT_VALUE,
+                                    "documentid": documentID
+                                }
+        
+                                if(RECURRING === true){
+                                    requestObject.recurring = true
+                                }
+                                
+                                editButton.classList.add("invalid")
+                                const sendEditReq = await editExpenseIncome(JSON.stringify(requestObject))
+        
+                                //console.log(sendEditReq)
+                                if(sendEditReq.updateData){
+                                    const successElement = document.querySelector(".successful")
+                                    successElement.style.display = "flex"
+                                    setTimeout(() => {
+                                        parent.classList.remove("show")
+                                        parent.classList.add("hide")
+                    
+                                        ADDITIONAL_ELEMENT.classList.remove("show")
+                                        ADDITIONAL_ELEMENT.classList.add("hide")
+                    
+                                        parent.addEventListener("animationend", ()=>{
+                                            parent.classList.remove("hide")
+                                            ADDITIONAL_ELEMENT.classList.remove("hide")
+                                            document.body.style.overflowY = "auto"
+        
+                                            ADDITIONAL_ELEMENT.innerHTML =``
+                                        })
+        
+                                    }, 1000);
+                                    //MUST REMEMBER COME AND CALL THE SET FUNCTIONS
+                                    expenseData = await getAllUserCreated()
+                                    donutsChartSet()
+                                    barChartSet()
+                                    expensesIncomeList()
+                                }else{
+                                    editButton.classList.remove("invalid")
+                                    console.log(sendEditReq)
+                                }
+                            }
+                        })
+                    }
+
                     //DELETING DATA
                     const delBtn = document.querySelectorAll(".delete")
                     for(let i = 0; i < delBtn.length; i++){
                         delBtn[i].addEventListener("click", ()=>{
-                            deletingTaskQuestion(data[i]._id, type)
+                            deletingDataQuestion(data[i]._id, type)
                         })
                     }
 
                     //EDIT DATA
-                    
+                    const editBtn = document.querySelectorAll(".edit")
+                    for(let i = 0; i < editBtn.length; i++){
+                        editBtn[i].addEventListener("click", ()=>{
+                            if(data[i].type === "expense"){
+                                editExpense(data[i])
+                            }else{
+                                editIncome(data[i])
+                            }
+                        })
+                    }
                 }
 
                 //filter the data like the donut chart
