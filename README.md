@@ -35,11 +35,13 @@ To get started with the Expense Tracker App locally, follow these steps:
 
 2. **Install Dependencies**:
 
-`npm install`
+    ```bash
+    npm install
 
 3. **Run the Application**:
 
-`npm start`
+    ```bash
+    npm start
 
 4. **View the Application**:
 
@@ -47,4 +49,4 @@ Open [http://localhost:5001/register](http://localhost:5001/register) in your we
 
 ---
 
-### Explore and Enjoy
+### Explore and Enjoy!
