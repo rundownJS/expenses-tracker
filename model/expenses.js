@@ -86,11 +86,7 @@ const ExpensesSchema = new mongoose.Schema({
         type: Date,
         default: Date.now(),
         immutable: true
-    },
-    history: {
-        changes: [mongoose.Schema.Types.Mixed]
     }
-
 }, {timestamps: true})
 
 
